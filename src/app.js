@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { connectDB } from "./config/db";
-import router from "./routes/index.js";
+import router from "./router";
 
 
 //config
