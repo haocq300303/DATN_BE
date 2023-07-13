@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-export const validator = (req, res, next) => {
+export const validation = (req, res, next) => {
     const schema = Joi.object({
         id_pitch: Joi.string().required(),
         id_user: Joi.string().required(),
