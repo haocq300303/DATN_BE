@@ -1,4 +1,4 @@
-import * as BookingService from "../services/booking.service";
+import * as PaymentService from "../services/payment.service";
 
 export const getList = async (req, res) => {
     try {
@@ -12,14 +12,14 @@ export const getList = async (req, res) => {
             ...params,
         };
 
-        const [bookings, count] = await Promise.all([BookingService.getList(options), BookingService.countDocuments()]);
+        const [payments, count] = await Promise.all([PaymentService.getList(options), PaymentService.countDocuments()]);
 
         res.status(200).json({
             meassge: "Success",
-            data: bookings,
+            data: payments,
             currentPage: page,
             totalPage: Math.ceil(count / limit),
-            length: bookings.length,
+            length: payments.length,
         });
     } catch (error) {
         res.status(500).json(serverError(error.message));
@@ -28,21 +28,21 @@ export const getList = async (req, res) => {
 
 export const getById = async (req, res) => {
     try {
-        const booking = await BookingService.getById(req.params.id);
+        const payment = await PaymentService.getById(req.params.id);
         res.json({
             meassge: "Success",
-            data: booking,
+            data: payment,
         });
     } catch (error) {
-        res.status(500).json(serverError(error.message));
+        console.log(error);
     }
 };
 export const create = async (req, res) => {
     try {
-        const newBooking = await BookingService.create(req.body);
+        const newPayment = await PaymentService.create(req.body);
         res.json({
             meassge: "New booking success",
-            data: newBooking,
+            data: newPayment,
         });
     } catch (error) {
         res.status(500).json(serverError(error.message));
@@ -51,10 +51,10 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
     try {
-        const bookingUpdated = await BookingService.update({ ...req.body, id: req.params.id });
+        const paymentUpdated = await PaymentService.update({ ...req.body, id: req.params.id });
         res.json({
             meassge: "Update booking success",
-            data: bookingUpdated,
+            data: paymentUpdated,
         });
     } catch (error) {
         res.status(500).json(serverError(error.message));
@@ -63,10 +63,10 @@ export const update = async (req, res) => {
 
 export const destroy = async (req, res) => {
     try {
-        const bookingDeleted = await BookingService.destroy(req.params.id);
+        const paymentDestroyed = await PaymentService.destroy(req.params.id);
         res.json({
             meassge: "Delete booking successfully",
-            data: bookingDeleted,
+            data: paymentDestroyed,
         });
     } catch (error) {
         res.status(500).json(serverError(error.message));
