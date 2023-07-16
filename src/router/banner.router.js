@@ -8,10 +8,10 @@ const routerBanner = express.Router();
 routerBanner.get("/", bannerController.getAll);
 
 // CREATE
-routerBanner.post("/add", bannerController.create);
+routerBanner.post("/", bannerController.create);
 
 // UPDATE
-routerBanner.put("/update/:id", bannerController.update);
+routerBanner.put("/:id", bannerController.update);
 
 // REMOVE
 routerBanner.delete("/:id", bannerController.remove);

@@ -7,10 +7,10 @@ const routerService = express.Router();
 routerService.get("/", serviceController.getAll);
 
 // CREATE
-routerService.post("/add", serviceController.create);
+routerService.post("/", serviceController.create);
 
 // UPDATE
-routerService.put("/update/:id", serviceController.update);
+routerService.put("/:id", serviceController.update);
 
 // REMOVE
 routerService.delete("/:id", serviceController.remove);
