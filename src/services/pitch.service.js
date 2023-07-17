@@ -1,10 +1,18 @@
 import Pitch from "../models/pitch.model";
 
-export const getAllLocation = async () => {
-    return Pitch.find();
+export const getAllPitch = async (data) => {
+    return Pitch.find(data);
 };
 export const getOnePitch = async (pitchId) => {
-    return await Pitch.findById(pitchId);
+    try {
+        const pitch = await Pitch.findById(pitchId).populate("location_id");
+        if (!pitch) {
+            throw new Error("Không tìm thấy sân bóng");
+        }
+        return pitch;
+    } catch (error) {
+        throw new Error(`Lỗi khi lấy thông tin sân bóng: ${error.message}`);
+    }
 };
 export const creatPitch = async (pitch) => {
     const product = new Pitch(pitch);
