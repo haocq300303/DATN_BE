@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import Role from "./role.model";
 
 const permissionSchema = new Schema(
   {
@@ -7,8 +8,7 @@ const permissionSchema = new Schema(
       required: true,
     },
     role_id: {
-      default: null,
-      type: mongoose.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Role",
     },
     code: {
@@ -17,7 +17,18 @@ const permissionSchema = new Schema(
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 );
+
+permissionSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const permission = this;
+    const role = await Role.findById(permission.role_id);
+    role.permissions.push(permission._id);
+    await role.save();
+  }
+  next();
+});
 
 export default mongoose.model("Permission", permissionSchema);
