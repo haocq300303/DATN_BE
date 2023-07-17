@@ -5,7 +5,7 @@ export const getAllPitch = async (data) => {
 };
 export const getOnePitch = async (pitchId) => {
     try {
-        const pitch = await Pitch.findById(pitchId).populate("location_id");
+        const pitch = await Pitch.findById(pitchId);
         if (!pitch) {
             throw new Error("Không tìm thấy sân bóng");
         }
