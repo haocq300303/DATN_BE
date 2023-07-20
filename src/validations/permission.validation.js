@@ -1,8 +1,8 @@
 import Joi from "joi";
 
 const permissionSchema = Joi.object({
-  name: Joi.string().required(),
-  role_id: Joi.string(),
+  name: Joi.string().min(3).required(),
+  role_id: Joi.string().required(),
   code: Joi.number().required(),
 });
 
