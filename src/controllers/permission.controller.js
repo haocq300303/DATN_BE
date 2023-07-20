@@ -3,12 +3,26 @@ import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
 import { permissionService } from "../services";
 import { permissionValidation } from "../validations";
-import Permission from "../models/permission.model";
 
 export const getAll = async (req, res) => {
   try {
     const permissions = await permissionService.getAll();
+    if (!permissions) {
+      return res.status(400).json(badRequest(400, "Lấy dữ liệu thất bại"));
+    }
     res.status(200).json(successfully(permissions, "Lấy dữ liệu thành công"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+export const getById = async (req, res) => {
+  try {
+    const permission = await permissionService.getById(req.params.id);
+    if (!permission) {
+      return res.status(400).json(badRequest(400, "Lấy dữ liệu thất bại"));
+    }
+    res.status(200).json(successfully(permission, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -20,7 +34,7 @@ export const create = async (req, res) => {
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
-    const permission = await Permission.create(req.body);
+    const permission = await permissionService.create(req.body);
     if (!permission) {
       return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
     }
@@ -36,13 +50,9 @@ export const update = async (req, res) => {
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
-    const permission = await Permission.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-      }
-    );
+    const permission = await permissionService.update(req.params.id, req.body, {
+      new: true,
+    });
     if (!permission) {
       return res
         .status(400)
@@ -56,7 +66,7 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const permission = await Permission.findByIdAndDelete(req.params.id);
+    const permission = await permissionService.remove(req.params.id);
     if (!permission) {
       return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
     }
