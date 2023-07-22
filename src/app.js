@@ -24,10 +24,15 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 
+// Connect to MongoDB Atlas
 
 router(app);
 // database config
 connectDB();
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server started on port ${process.env.PORT}`);
+});
 
 
 export const viteNodeApp = app;
