@@ -1,6 +1,6 @@
 export * as permissionService from "./permission.service";
-<<<<<<< HEAD
-
-=======
 export * as roleService from "./role.service";
->>>>>>> developer
+export * as postService from "./post.service";
+export * as commentService from "./comment.service";
+export * as childrenPitchService from "./chirldrenPitch.service"
+export * as shiftModelService from "./shift.service"

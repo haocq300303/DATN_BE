@@ -24,10 +24,13 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 
+// Connect to MongoDB Atlas
 
 router(app);
 // database config
 connectDB();
+
+
 
 
 export const viteNodeApp = app;
