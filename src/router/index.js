@@ -7,6 +7,9 @@ import routerService from "./service.router";
 import routerPost from "./post.router";
 import routerRole from "./role.router";
 import routerComment from "./comment.router";
+import routerLocation from "./location.router";
+import routerPitch from "./pitch.router";
+
 import routerShift from "./shift.router";
    
 export default function routes(app) {
@@ -20,4 +23,7 @@ export default function routes(app) {
   app.use("/api/services", routerService);
   app.use("/api/childrentPicth",routerChildrentPitch)
   app.use("/api/shift", routerShift)
+  app.use("/api/location", routerLocation);
+  app.use("/api/pitch", routerPitch);
+
 }
