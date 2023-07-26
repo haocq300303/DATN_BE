@@ -1,4 +1,6 @@
 export * as permissionValidation from "./permission.validation";
+export * as bannerValidation from "./banner.validation";
+export * as serviceValidation from "./service.validation";
 export * as roleValidation from "./role.validation";
 export * as postSchemaValidation from "./post.validation";
 export * as commentSchemaValidation from "./comment.validation";
