@@ -9,9 +9,9 @@ import routerRole from "./role.router";
 import routerComment from "./comment.router";
 import routerLocation from "./location.router";
 import routerPitch from "./pitch.router";
-
 import routerShift from "./shift.router";
-   
+import routerFeedback from "./feedback.router";
+
 export default function routes(app) {
   app.use("/api/bookings", bookingRouter);
   app.use("/api/payments", paymentRouter);
@@ -21,9 +21,9 @@ export default function routes(app) {
   app.use("/api/comments", routerComment);
   app.use("/api/banners", routerBanner);
   app.use("/api/services", routerService);
-  app.use("/api/childrentPicth",routerChildrentPitch)
-  app.use("/api/shift", routerShift)
+  app.use("/api/childrentPicth", routerChildrentPitch);
+  app.use("/api/shift", routerShift);
   app.use("/api/location", routerLocation);
   app.use("/api/pitch", routerPitch);
-
+  app.use("/api/feedback", routerFeedback);
 }

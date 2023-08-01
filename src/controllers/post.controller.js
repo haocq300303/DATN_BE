@@ -2,7 +2,7 @@ import { badRequest } from "../formatResponse/badRequest";
 import { successfully } from "../formatResponse/successfully";
 import { serverError } from "../formatResponse/serverError";
 import Post from "../models/post.model";
-import { postSchemaValidation } from "../validations";
+import { postValidation } from "../validations";
 import { postService } from "../services";
 
 // Get All Post

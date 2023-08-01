@@ -1,9 +1,9 @@
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
-import Comment from "../models/comment.model";
+import Pitch from "../models/pitch.model";
 import Post from "../models/post.model";
-import { commentSchemaValidation } from "../validations";
+import { commentValidation } from "../validations";
 import { commentService } from "../services";
 
 // Get All Comment
@@ -98,9 +98,16 @@ export const createComment = async (req, res) => {
       return res.status(400).json(badRequest(400, "Bình luận thất bại!"));
     }
 
-    await Post.findByIdAndUpdate(comment.id_post, {
-      $addToSet: { comment_id: comment._id },
-    });
+    if (comment.id_post) {
+      await Post.findByIdAndUpdate(comment.id_post, {
+        $addToSet: { comment_id: comment._id },
+      });
+    }
+    if (comment.id_pitch) {
+      await Pitch.findByIdAndUpdate(comment.id_pitch, {
+        $addToSet: { comment_id: comment._id },
+      });
+    }
 
     res.status(200).json(successfully(comment, "Bình luận thành công"));
   } catch (error) {
@@ -153,9 +160,16 @@ export const deleteComment = async (req, res) => {
       return res.status(400).json(badRequest(400, "Xóa bình luận thất bại!"));
     }
 
-    await Post.findByIdAndUpdate(comment.id_post, {
-      $pull: { comment_id: comment._id },
-    });
+    if (comment.id_post) {
+      await Post.findByIdAndUpdate(comment.id_post, {
+        $pull: { comment_id: comment._id },
+      });
+    }
+    if (comment.id_pitch) {
+      await Pitch.findByIdAndUpdate(comment.id_post, {
+        $pull: { comment_id: comment._id },
+      });
+    }
 
     res.status(200).json(successfully(comment, "Xóa bình luận thành công"));
   } catch (error) {
