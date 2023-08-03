@@ -28,5 +28,5 @@ export const updateComment = (comment) => {
 };
 
 export const deleteComment = (idComment) => {
-  return Comment.deleteMany();
+  return Comment.findByIdAndDelete(idComment);
 };
