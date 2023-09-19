@@ -3,8 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { connectDB } from "./config/db";
-import router from "./router";
-
+import router from "./routes";
 
 //config
 const app = express();
@@ -24,10 +23,8 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 
-
 router(app);
 // database config
 connectDB();
-
 
 export const viteNodeApp = app;
