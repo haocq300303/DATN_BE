@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { connectDB } from "./config/db";
-import router from "./routes";
+import router from "./router";
 
 //config
 const app = express();
@@ -22,6 +22,8 @@ try {
 app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
+
+// Connect to MongoDB Atlas
 
 router(app);
 // database config

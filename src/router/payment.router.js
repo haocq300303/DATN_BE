@@ -10,3 +10,4 @@ router.route("/").get(PaymentController.getList).post(PaymentValidation.validati
 const paymentRouter = router;
 
 export default paymentRouter;
+
