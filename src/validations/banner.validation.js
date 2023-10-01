@@ -1,6 +1,7 @@
 import Joi from "joi";
 
 const bannerSchema = Joi.object({
+    _id: Joi.string(),
     url: Joi.string().required(),
     content: Joi.string().required(),
 });

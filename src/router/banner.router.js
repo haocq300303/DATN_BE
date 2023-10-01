@@ -7,11 +7,16 @@ const routerBanner = express.Router();
 // GET ALL
 routerBanner.get("/", bannerController.getAll);
 
+
+// GET ONE 
+routerBanner.get("/:id", bannerController.getOne);
+
+
 // CREATE
 routerBanner.post("/", bannerController.create);
 
 // UPDATE
-routerBanner.put("/:id", bannerController.update);
+routerBanner.patch("/:id", bannerController.update);
 
 // REMOVE
 routerBanner.delete("/:id", bannerController.remove);
