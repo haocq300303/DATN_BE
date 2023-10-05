@@ -1,4 +1,5 @@
 import * as BookingService from "../services/booking.service";
+import { serverError } from "../formatResponse/serverError";
 
 export const getList = async (req, res) => {
     try {

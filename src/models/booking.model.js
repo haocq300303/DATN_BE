@@ -3,15 +3,20 @@ const Schema = mongoose.Schema;
 
 const Booking = new Schema(
     {
-        id_pitch: { type: String, require: true },
-        id_user: { type: String, require: true },
-        id_shift: { type: String, require: true },
-        id_children_pitch: { type: String, require: true },
-        id_payment: { type: String, require: true },
-        price: { type: Number, require: true },
+        pitch_id: { type: Schema.Types.ObjectId, ref: "Pitch" },
+        user_id: { type: Schema.Types.ObjectId },
+        shift_id: { type: String, require: true },
+        children_pitch_id: { type: String, require: true },
+        payment_id: { type: Schema.Types.ObjectId, ref: "Payment" },
     },
     { collection: "booking", timestamps: true }
 );
+
+Booking.virtual("user", {
+    ref: "User",
+    localField: "user_id",
+    foreignField: "_id",
+});
 
 const BookingModel = mongoose.model("booking", Booking);
 
