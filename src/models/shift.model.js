@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 const shiftSchema = new mongoose.Schema({
     id_chirlden_pitch:{
-       type: String,
-       required: true,
+       type: String
     },
     timeslot:{ // ca san 
         type:Array,
