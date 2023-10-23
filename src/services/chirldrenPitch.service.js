@@ -1,10 +1,18 @@
 import ChildrenPitch from "../models/chirldrenPitch.model";
 
-export const getAll = async () => {
-  return ChildrenPitch.find();
+export const getAll = async (options) => {
+  return ChildrenPitch.paginate(
+    {},
+    { ...options, populate: ["idParentPitch"] }
+  );
+  F;
 };
 export const getById = async (id) => {
-  return ChildrenPitch.findById(id);
+  return ChildrenPitch.findById(id).populate(["idParentPitch"]);
+};
+
+export const getChildrenPitchsByParent = (idParentPitch) => {
+  return ChildrenPitch.find({ idParentPitch });
 };
 
 export const create = async (data) => {

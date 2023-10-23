@@ -1,20 +1,29 @@
 import mongoose from "mongoose";
-const shiftSchema = new mongoose.Schema({
-    id_chirlden_pitch:{
-       type: String,
-       required: true,
+const shiftSchema = new mongoose.Schema(
+  {
+    shift_name: {
+      type: Number,
+      min: 1,
+      required: true,
+      unique: true,
     },
-    timeslot:{ // ca san 
-        type:Array,
-        required:true,
+    start_time: {
+      type: String,
+      required: true,
     },
-    price:{
-        type: Number,
-        required:true,
+    end_time: {
+      type: String,
+      required: true,
     },
-    statusPitch:{
-        type:Boolean,
-        required:true,
-    }
-})
-export default mongoose.model("Shift",shiftSchema);
+    price: {
+      type: Number,
+      required: true,
+    },
+    statusPitch: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { versionKey: false, timestamps: true }
+);
+export default mongoose.model("Shift", shiftSchema);
