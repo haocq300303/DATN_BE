@@ -50,6 +50,36 @@ export const create = async (req, res) => {
     }
 };
 
+export const getByCode = async (req, res) => {
+    try {
+        const bookingDb = await BookingService.getByPaymentId(req.query.payment_id);
+        res.json({
+            meassge: "Lấy dữ liệu booking thành công",
+            data: bookingDb,
+        });
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
+    }
+};
+
+export const createAffterPay = async (req, res) => {
+    try {
+        const { payment_id } = req.body;
+        const bookingDb = await BookingService.getOne({ payment_id });
+        if (bookingDb) {
+            return res.status(200).json({ message: "Sân đã được đặt trước đó" });
+        }
+
+        const newBooking = await BookingService.create(req.body);
+        res.status(201).json({
+            meassge: "New booking success",
+            data: newBooking,
+        });
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
+    }
+};
+
 export const update = async (req, res) => {
     try {
         const bookingUpdated = await BookingService.update({ ...req.body, id: req.params.id });
