@@ -1,25 +1,21 @@
+import mongoose, { ObjectId } from "mongoose";
 import BookingModel from "../models/booking.model";
-import userModel from "../models/user.model";
 
 export const getList = async (options) => {
-    const { skip, limit, sort, ...params } = options;
-    // return await BookingModel.find(params)
-    //     .populate([
-    //         {
-    //             path: "user_id",
-    //             model: userModel,
-    //             select: { name: true, phone_number: true, email: true },
-    //         },
+    const { skip, limit, sort, ...query } = options;
+    const filter = {
+        ...query,
+    };
 
-    //     ])
-    //     .sort(sort)
-    //     .skip(skip)
-    //     .limit(limit);
     return await BookingModel.aggregate([
+        {
+            $match: filter,
+        },
+        { $addFields: { userId: { $toObjectId: "$user_id" }, pitchId: { $toObjectId: "$pitch_id" } } },
         {
             $lookup: {
                 from: "users",
-                localField: "user_id",
+                localField: "userId",
                 foreignField: "_id",
                 as: "user",
             },
@@ -30,7 +26,7 @@ export const getList = async (options) => {
         {
             $lookup: {
                 from: "pitches",
-                localField: "pitch_id",
+                localField: "pitchId",
                 foreignField: "_id",
                 as: "pitch",
             },
@@ -67,10 +63,47 @@ export const countDocuments = async () => {
 export const getById = async (bookingId) => {
     return await BookingModel.findById(bookingId);
 };
+export const getOne = async ({ field }) => {
+    return await BookingModel.findOne({ [field]: field });
+};
+export const getByPaymentId = async (payment_id) => {
+    const result = await BookingModel.aggregate([
+        {
+            $match: { payment_id },
+        },
+        { $addFields: { paymentId: { $toObjectId: "$payment_id" } } },
+        {
+            $lookup: {
+                from: "payment",
+                localField: "paymentId",
+                foreignField: "_id",
+                as: "payment",
+            },
+        },
+        {
+            $unwind: { path: "$payment", preserveNullAndEmptyArrays: true },
+        },
+        {
+            $project: {
+                payment_id: 1,
+                payment: 1,
+                shift_id: 1,
+                createdAt: 1,
+                updatedAt: 1,
+            },
+        },
+    ]);
+
+    return result.length > 0 ? result[0] : null;
+};
 
 export const create = async (booking) => {
-    const product = new BookingModel(booking);
-    return await product.save();
+    const newBooking = new BookingModel(booking);
+    return await newBooking.save();
+};
+export const createAffterPay = async (booking) => {
+    const newBooking = new BookingModel(booking);
+    return await newBooking.save();
 };
 export const update = async (booking) => {
     const { id, ...data } = booking;

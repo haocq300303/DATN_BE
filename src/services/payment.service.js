@@ -9,7 +9,6 @@ export const getList = async (options) => {
                 path: "user_bank",
                 model: userModel,
                 select: { name: true, phone_number: true, email: true },
-                as: "hi",
             },
             {
                 path: "user_receiver",
