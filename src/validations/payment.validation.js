@@ -2,9 +2,11 @@ import Joi from "joi";
 
 export const validation = (req, res, next) => {
     const schema = Joi.object({
-        id_user: Joi.string().required(),
+        payment_method: Joi.string().required(),
+        user_bank: Joi.string().required(),
+        user_receiver: Joi.string().required(),
         price: Joi.number().required(),
-        status: Joi.boolean().required(),
+        status: Joi.string().required(),
         message: Joi.string().required(),
     });
 
