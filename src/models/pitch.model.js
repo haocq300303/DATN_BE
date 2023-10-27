@@ -36,8 +36,7 @@ const PitchSchema = new Schema(
       },
     ],
     location_id: {
-      type: mongoose.ObjectId,
-      ref: "Location",
+      type: String,
       required: true,
     },
     deposit_price: {

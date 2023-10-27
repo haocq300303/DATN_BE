@@ -3,7 +3,8 @@ import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
 import { pitchService } from "../services";
 import { pitchValidation } from "../validations";
-import Location from "../models/location.model";
+import fs from "fs";
+const locationJson = JSON.parse(fs.readFileSync("locations.json"));
 
 export const getAll = async (req, res) => {
   try {
@@ -12,6 +13,8 @@ export const getAll = async (req, res) => {
       limit = 10,
       _sort = "createdAt",
       _order = "asc",
+      districtId,
+      wardId,
       ...params
     } = req.query;
 
@@ -27,13 +30,34 @@ export const getAll = async (req, res) => {
       },
     };
     const pitchs = await pitchService.getAllPitch(options);
-    console.log(pitchs);
 
     if (!pitchs || pitchs.length === 0) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
 
-    res.status(200).json(successfully(pitchs, "Lấy dữ liệu thành công"));
+    const { data: dataPitch, ...pagi } = pitchs;
+    let data = {};
+    if (districtId) {
+      const wardIdsInDistricts = locationJson.wards
+        .filter((ward) => ward.parent === districtId)
+        .map((ward) => ward.id);
+
+      const newPitchs = pitchs.data.filter((item) =>
+        wardIdsInDistricts.includes(item.location_id)
+      );
+      data.data = newPitchs;
+    } else if (wardId) {
+      const newPitchs = pitchs.data.filter(
+        (item) => item.location_id === wardId
+      );
+      data.data = newPitchs;
+    } else {
+      data.data = dataPitch;
+    }
+
+    res
+      .status(200)
+      .json(successfully({ ...data, ...pagi }, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -64,10 +88,6 @@ export const create = async (req, res) => {
     if (!pitch) {
       return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
     }
-
-    await Location.findByIdAndUpdate(pitch.location_id, {
-      $addToSet: { pitchs: pitch._id },
-    });
 
     res.status(200).json(successfully(pitch, "Thêm thành công !!!"));
   } catch (error) {
@@ -100,10 +120,6 @@ export const remove = async (req, res) => {
     if (!pitch) {
       return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
     }
-
-    await Location.findByIdAndUpdate(pitch.location_id, {
-      $pull: { shifts: pitch._id },
-    });
 
     res.status(200).json(successfully(pitch, "Xóa thành công !!!"));
   } catch (error) {

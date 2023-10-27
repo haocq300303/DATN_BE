@@ -1,5 +1,6 @@
 import Joi from "joi";
 const shiftSchema = Joi.object({
+  id_pitch: Joi.string().required(),
   shift_name: Joi.number().min(1).required(),
   start_time: Joi.string().required(),
   end_time: Joi.string().required(),

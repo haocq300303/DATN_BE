@@ -3,6 +3,8 @@ import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
 import { locationService, pitchService } from "../services";
 import { locationValidation } from "../validations";
+import fs from "fs";
+const locationJson = JSON.parse(fs.readFileSync("locations.json"));
 
 export const getAll = async (req, res) => {
   try {
@@ -16,6 +18,23 @@ export const getAll = async (req, res) => {
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
+};
+
+export const getAllProvince = (req, res) => {
+  res.json(locationJson.provinces);
+};
+
+export const getAllDistrictByParent = (req, res) => {
+  const { parent } = req.query;
+  const data = locationJson.districts?.filter((item) => item.parent === parent);
+  res.json(data);
+};
+
+export const getAllwardByParent = (req, res) => {
+  const { parent } = req.query;
+  const data = locationJson.wards?.filter((item) => item.parent === parent);
+
+  res.json(data);
 };
 
 export const getById = async (req, res) => {

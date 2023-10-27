@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 const shiftSchema = new mongoose.Schema(
   {
+    id_pitch: {
+      type: mongoose.ObjectId,
+      ref: "Pitch",
+      required: true,
+    },
     shift_name: {
       type: Number,
       min: 1,

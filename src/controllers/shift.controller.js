@@ -31,14 +31,14 @@ export const getByID = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-    const { id_pitch, ...data } = req.body;
-    const { error } = shiftValidation.default.validate(data);
+    const { id_pitch } = req.body;
+    const { error } = shiftValidation.default.validate(req.body);
 
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
 
-    const shift = await shiftModelService.creat(data);
+    const shift = await shiftModelService.creat(req.body);
 
     if (!shift) {
       return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
