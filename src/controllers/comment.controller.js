@@ -77,7 +77,7 @@ export const createComment = async (req, res) => {
   try {
     const { _id: id_user } = req.user;
 
-    const { error } = commentSchemaValidation.default.validate(
+    const { error } = commentValidation.default.validate(
       { id_user, ...req.body },
       {
         abortEarly: false,
@@ -121,7 +121,7 @@ export const updateComment = async (req, res) => {
     const { idComment } = req.params;
     const { _id: id_user } = req.user;
 
-    const { error } = commentSchemaValidation.default.validate(
+    const { error } = commentValidation.default.validate(
       { id_user, ...req.body },
       {
         abortEarly: false,
