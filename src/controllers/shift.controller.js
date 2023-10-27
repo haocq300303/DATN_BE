@@ -51,6 +51,7 @@ export const create = async (req, res) => {
 
   export const update = async (req, res) => {
     try {
+      
       const { error } = shiftValidation.default.validate(req.body);
       if (error) {
         return res.status(400).json(badRequest(400, error.details[0].message));
