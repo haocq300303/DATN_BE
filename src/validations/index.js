@@ -2,6 +2,8 @@ export * as permissionValidation from "./permission.validation";
 export * as bannerValidation from "./banner.validation";
 export * as serviceValidation from "./service.validation";
 export * as roleValidation from "./role.validation";
+export * as userValidation from "./user.validation";
+export * as otpValidation from "./otp.validation";
 export * as postValidation from "./post.validation";
 export * as commentValidation from "./comment.validation";
 export * as chilrenPitchValdation from "./childrenPitch.validation";

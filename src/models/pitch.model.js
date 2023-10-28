@@ -47,4 +47,4 @@ const PitchSchema = new Schema({
   feedback_id: [{ type: mongoose.ObjectId, ref: "Feedback" }],
 });
 
-export default mongoose.model("Pitch", PitchSchema);
+export default mongoose.model("Pitches", PitchSchema);

@@ -10,7 +10,7 @@ routerService.get("/", serviceController.getAll);
 routerService.post("/", serviceController.create);
 
 // UPDATE
-routerService.put("/:id", serviceController.update);
+routerService.patch("/:id", serviceController.update);
 
 // REMOVE
 routerService.delete("/:id", serviceController.remove);

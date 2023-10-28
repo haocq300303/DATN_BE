@@ -1,5 +1,7 @@
 export * as permissionController from "./permission.controller";
 export * as roleController from "./role.controller";
+export * as userController from "./user.controller";
+export * as otpController from "./otp.controller";
 export * as bannerController from "./banner.controller";
 export * as serviceController from "./service.controller";
 export * as postController from "./post.controller";
