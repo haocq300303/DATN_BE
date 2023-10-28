@@ -13,6 +13,7 @@ import routerLocation from "./location.router";
 import routerPitch from "./pitch.router";
 import routerShift from "./shift.router";
 import routerFeedback from "./feedback.router";
+import routerPayment from "./vnpay.router";
 
 export default function routes(app) {
   app.use("/api/bookings", bookingRouter);
@@ -30,4 +31,5 @@ export default function routes(app) {
   app.use("/api/location", routerLocation);
   app.use("/api/pitch", routerPitch);
   app.use("/api/feedback", routerFeedback);
+  app.use("/api/vnpay", routerPayment);
 }

@@ -1,7 +1,6 @@
 import { badRequest } from "../formatResponse/badRequest";
 import { successfully } from "../formatResponse/successfully";
 import { serverError } from "../formatResponse/serverError";
-import Post from "../models/post.model";
 import { postValidation } from "../validations";
 import { postService } from "../services";
 
@@ -75,7 +74,7 @@ export const createPost = async (req, res) => {
   try {
     const { _id: id_user } = req.user;
 
-    const { error } = postSchemaValidation.default.validate(
+    const { error } = postValidation.default.validate(
       { id_user, ...req.body },
       {
         abortEarly: false,
@@ -104,7 +103,7 @@ export const updatePost = async (req, res) => {
     const { idPost } = req.params;
     const { _id: id_user } = req.user;
 
-    const { error } = postSchemaValidation.default.validate(
+    const { error } = postValidation.default.validate(
       { id_user, ...req.body },
       {
         abortEarly: false,
