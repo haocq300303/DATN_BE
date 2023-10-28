@@ -3,12 +3,11 @@ const Schema = mongoose.Schema;
 
 const Booking = new Schema(
     {
-        id_pitch: { type: String, require: true },
-        id_user: { type: String, require: true },
-        id_shift: { type: String, require: true },
-        id_children_pitch: { type: String, require: true },
-        id_payment: { type: String, require: true },
-        price: { type: Number, require: true },
+        pitch_id: { type: String, require: true },
+        user_id: { type: String, require: true },
+        shift_id: { type: String, require: true },
+        children_pitch_id: { type: String, require: true },
+        payment_id: { type: String, require: true },
     },
     { collection: "booking", timestamps: true }
 );

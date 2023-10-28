@@ -2,11 +2,13 @@ import Joi from "joi";
 
 export const validation = (req, res, next) => {
     const schema = Joi.object({
-        pitch_id: Joi.string().required(),
-        user_id: Joi.string().required(),
-        shift_id: Joi.string().required(),
-        children_pitch_id: Joi.string().required(),
-        payment_id: Joi.string().required(),
+        user_bank: Joi.string().required(),
+        user_receiver: Joi.string().required(),
+        vnp_OrderInfo: Joi.string().required(),
+        price_received: Joi.number().required(),
+        total_received: Joi.number().required(),
+        bank_code: Joi.string().allow(""),
+        language: Joi.string(),
     });
 
     const result = schema.validate(req.body);
