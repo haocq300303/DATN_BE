@@ -3,6 +3,7 @@ import BookingModel from "../models/booking.model";
 
 export const getList = async (options) => {
     const { skip, limit, sort, ...query } = options;
+
     const filter = {
         ...query,
     };
@@ -11,7 +12,14 @@ export const getList = async (options) => {
         {
             $match: filter,
         },
-        { $addFields: { userId: { $toObjectId: "$user_id" }, pitchId: { $toObjectId: "$pitch_id" } } },
+        {
+            $addFields: {
+                userId: { $toObjectId: "$user_id" },
+                pitchId: { $toObjectId: "$pitch_id" },
+                paymentId: { $toObjectId: "$payment_id" },
+                shiftId: { $toObjectId: "$shift_id" },
+            },
+        },
         {
             $lookup: {
                 from: "users",
@@ -35,7 +43,30 @@ export const getList = async (options) => {
             $unwind: { path: "$pitch", preserveNullAndEmptyArrays: true },
         },
         {
+            $lookup: {
+                from: "payment",
+                localField: "paymentId",
+                foreignField: "_id",
+                as: "payment",
+            },
+        },
+        {
+            $unwind: { path: "$payment", preserveNullAndEmptyArrays: true },
+        },
+        {
+            $lookup: {
+                from: "shifts",
+                localField: "shiftId",
+                foreignField: "_id",
+                as: "shift",
+            },
+        },
+        {
+            $unwind: { path: "$shift", preserveNullAndEmptyArrays: true },
+        },
+        {
             $project: {
+                user_id: 1,
                 user_booking: {
                     _id: "$user._id",
                     name: "$user.name",
@@ -48,10 +79,24 @@ export const getList = async (options) => {
                     avatar: "$pitch.avatar",
                     address: "$pitch.address",
                 },
+                payment: {
+                    _id: "$payment._id",
+                    payment_method: "$payment.method",
+                    price_received: "$payment.price_received",
+                    code: "$payment.code",
+                    total_received: "$payment.total_received",
+                    status: "$payment.status",
+                    message: "$payment.message",
+                },
+                status: 1,
                 shift_id: 1,
+                shift: 1,
                 createdAt: 1,
                 updatedAt: 1,
             },
+        },
+        {
+            $sort: sort,
         },
     ]);
 };
@@ -63,8 +108,8 @@ export const countDocuments = async () => {
 export const getById = async (bookingId) => {
     return await BookingModel.findById(bookingId);
 };
-export const getOne = async ({ field }) => {
-    return await BookingModel.findOne({ [field]: field });
+export const getOne = async (condition) => {
+    return await BookingModel.findOne(condition);
 };
 export const getByPaymentId = async (payment_id) => {
     const result = await BookingModel.aggregate([

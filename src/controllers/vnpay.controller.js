@@ -55,7 +55,7 @@ class PayMentController {
             vnp_Params["vnp_TxnRef"] = orderId;
             vnp_Params["vnp_OrderInfo"] = vnp_OrderInfo + orderId;
             vnp_Params["vnp_OrderType"] = "other";
-            vnp_Params["vnp_Amount"] = price_received * 100;
+            vnp_Params["vnp_Amount"] = price_received ;
             vnp_Params["vnp_ReturnUrl"] = returnUrl;
             vnp_Params["vnp_IpAddr"] = ipAddr;
             vnp_Params["vnp_CreateDate"] = createDate;
@@ -114,7 +114,7 @@ class PayMentController {
                                         user_bank,
                                         user_receiver,
                                         price_received: vnp_Params["vnp_Amount"],
-                                        total_received: total_received * 1000,
+                                        total_received: total_received,
                                         code: vnp_Params["vnp_TxnRef"],
                                         message: vnp_Params["vnp_OrderInfo"],
                                         payment_method: "banking",

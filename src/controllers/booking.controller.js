@@ -53,6 +53,7 @@ export const create = async (req, res) => {
 export const getByCode = async (req, res) => {
     try {
         const bookingDb = await BookingService.getByPaymentId(req.query.payment_id);
+
         res.json({
             meassge: "Lấy dữ liệu booking thành công",
             data: bookingDb,
