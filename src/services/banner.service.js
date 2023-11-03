@@ -4,7 +4,7 @@ export const getAll = async () => {
     return Banner.find();
  };
  export const getById = async (bannerId) => {
-    return ServiceModel.findById(bannerId);
+    return Banner.findById(bannerId);
 }
 
  export const createDT = async (data) => {

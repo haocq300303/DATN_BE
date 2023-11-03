@@ -8,6 +8,7 @@ const locationSchema = Joi.object({
   numberPitch: Joi.number().required(),
   description: Joi.string().required(),
   shifts: Joi.array(),
+  services: Joi.array(),
   location_id: Joi.string().required(),
   deposit_price: Joi.number().required(),
   avatar: Joi.string().required(),
