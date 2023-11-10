@@ -1,8 +1,24 @@
 import PaymentModel from "../models/payment.model";
+import userModel from "../models/user.model";
 
 export const getList = async (options) => {
     const { skip, limit, sort, ...params } = options;
-    return await PaymentModel.find(params).sort(sort).skip(skip).limit(limit);
+    return await PaymentModel.find(params)
+        .populate([
+            {
+                path: "user_bank",
+                model: userModel,
+                select: { name: true, phone_number: true, email: true },
+            },
+            {
+                path: "user_receiver",
+                model: userModel,
+                select: { name: true, phone_number: true, email: true },
+            },
+        ])
+        .sort(sort)
+        .skip(skip)
+        .limit(limit);
 };
 
 export const countDocuments = async () => {

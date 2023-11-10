@@ -5,7 +5,6 @@ import morgan from "morgan";
 import { connectDB } from "./config/db";
 import router from "./router";
 
-
 //config
 const app = express();
 dotenv.config();
@@ -29,8 +28,5 @@ app.use(morgan("tiny"));
 router(app);
 // database config
 connectDB();
-
-
-
 
 export const viteNodeApp = app;

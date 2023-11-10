@@ -25,6 +25,9 @@ const shiftSchema = new mongoose.Schema({
     },
     statusPitch:{
         type:Boolean
+    },
+    date:{
+        type:String,
     }
 })
 export default mongoose.model("Shift",shiftSchema);

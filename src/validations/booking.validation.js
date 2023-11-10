@@ -1,13 +1,12 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 export const validation = (req, res, next) => {
     const schema = Joi.object({
-        id_pitch: Joi.string().required(),
-        id_user: Joi.string().required(),
-        id_shift: Joi.string().required(),
-        id_children_pitch: Joi.string().required(),
-        id_payment: Joi.string().required(),
-        price: Joi.number().required()
+        pitch_id: Joi.string().required(),
+        user_id: Joi.string().required(),
+        shift_id: Joi.string().required(),
+        children_pitch_id: Joi.string().required(),
+        payment_id: Joi.string().required(),
     });
 
     const result = schema.validate(req.body);

@@ -3,9 +3,13 @@ const Schema = mongoose.Schema;
 
 const Payment = new Schema(
     {
-        id_user: { type: String, require: true },
-        price: { type: Number, require: true },
-        status: { type: Boolean, require: true },
+        user_bank: { type: Schema.Types.ObjectId, ref: "User" },
+        user_receiver: { type: Schema.Types.ObjectId, ref: "User" },
+        payment_method: { type: String, require: true, enum: ["cash", "banking"], default: "cash" },
+        price_received: { type: Number, require: true },
+        code: { type: String, require: true, unique: true },
+        total_received: { type: Number, require: true },
+        status: { type: String, require: true, enum: ["pending", "success", "error"], default: "pending" },
         message: { type: String, require: true, maxLength: 255 },
     },
     { collection: "payment", timestamps: true }
