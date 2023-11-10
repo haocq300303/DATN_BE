@@ -7,15 +7,33 @@ import Pitch from "../models/pitch.model";
 
 export const getAll = async (req, res) => {
   try {
-    const shifts = await shiftModelService.getAll();
+    const shifts = await shiftModelService.getAll(); 
     if (!shifts || shifts.length === 0) {
       return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
     }
-    res.status(200).json(successfully(shifts, "lấy dữ liệu thành công"));
+    
+    const { date } = req.query;
+    if (!date) {
+      return res
+        .status(200)
+        .json(successfully(shifts, "okey"));
+    }
+
+    const filteredShifts = shifts.filter((shift) => shift.date === date);
+    if (filteredShifts.length === 0) {
+      return res
+        .status(404)
+        .json(badRequest(400, "Không có dữ liệu cho ngày này"));
+    }
+
+    res
+    .status(200)
+    .json(successfully(filteredShifts, "lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
+
 
 export const getByID = async (req, res) => {
   try {

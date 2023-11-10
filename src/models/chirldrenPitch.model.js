@@ -10,12 +10,11 @@ const childrenPitchSchema = new mongoose.Schema(
     },
     code_chirldren_pitch: {
       type: Number,
-      required: true,
     },
-    images: {
+    idShifts:{
       type: Array,
-      default: [],
-    },
+      required: true,
+    }
   },
   { timestamps: true, versionKey: false }
 );
