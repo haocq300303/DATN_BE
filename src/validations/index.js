@@ -11,3 +11,4 @@ export * as shiftValidation from "./shift.validation";
 export * as locationValidation from "./location.validation";
 export * as pitchValidation from "./pitch.validation";
 export * as feedbackValidation from "./feedback.validation";
+export * as emailValidation from "./email.validation";

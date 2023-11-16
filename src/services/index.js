@@ -9,3 +9,4 @@ export * as shiftModelService from "./shift.service";
 export * as locationService from "./location.service";
 export * as pitchService from "./pitch.service";
 export * as feedbackService from "./feedback.service";
+export * as emailService from "./email.service";

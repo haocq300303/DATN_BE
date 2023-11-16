@@ -14,6 +14,7 @@ import routerPitch from "./pitch.router";
 import routerShift from "./shift.router";
 import routerFeedback from "./feedback.router";
 import routerPayment from "./vnpay.router";
+import routerEmail from "./email.router";
 
 export default function routes(app) {
   app.use("/api/bookings", bookingRouter);
@@ -32,4 +33,5 @@ export default function routes(app) {
   app.use("/api/pitch", routerPitch);
   app.use("/api/feedback", routerFeedback);
   app.use("/api/vnpay", routerPayment);
+  app.use("/api/email", routerEmail);
 }
