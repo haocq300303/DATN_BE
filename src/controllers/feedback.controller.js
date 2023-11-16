@@ -94,7 +94,15 @@ export const updateFeedback = async (req, res) => {
       return res.status(400).json(badRequest(400, errors));
     }
 
-    const feedback = await feedbackService.updateFeedback({
+    const feedback = await feedbackService.getByOptions({
+      field: "_id",
+      payload: idFeedback,
+    });
+
+    if (!feedback && feedback.id_user !== id_user)
+      return res.status(403).json(badRequest(403, "Không có quyền!"));
+
+    const newFeedback = await feedbackService.updateFeedback({
       idFeedback,
       id_user,
       ...req.body,
@@ -104,7 +112,7 @@ export const updateFeedback = async (req, res) => {
       return res.status(400).json(badRequest(400, "Sửa Đánh giá thất bại!"));
     }
 
-    res.status(200).json(successfully(feedback, "Sửa Đánh giá thành công"));
+    res.status(200).json(successfully(newFeedback, "Sửa Đánh giá thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
