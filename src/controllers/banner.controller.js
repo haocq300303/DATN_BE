@@ -10,7 +10,18 @@ export const getAll = async (req, res) => {
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
-};
+}
+  export const getOne = async (req, res) => {
+    try {
+      const banner = await bannerService.getById(req.params.id);
+      res.json({
+        meassge: "Lây dữ liệu thành công",
+        data: banner,
+    });
+    } catch (error) {
+      res.status(500).json(serverError(error.message));
+    }
+  };
 
 export const create = async (req, res) => {
   try {

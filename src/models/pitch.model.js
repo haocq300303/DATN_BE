@@ -35,6 +35,12 @@ const PitchSchema = new Schema(
         ref: "Shift",
       },
     ],
+    services: [
+      {
+        type: mongoose.ObjectId,
+        ref: "Service",
+      },
+    ],
     location_id: {
       type: String,
       required: true,
@@ -55,4 +61,4 @@ const PitchSchema = new Schema(
 
 PitchSchema.plugin(mongoosePaginate);
 
-export default mongoose.model("Pitch", PitchSchema);
+export default mongoose.model("Pitches", PitchSchema);
