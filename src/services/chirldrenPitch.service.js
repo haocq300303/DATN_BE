@@ -3,9 +3,8 @@ import ChildrenPitch from "../models/chirldrenPitch.model";
 export const getAll = async (options) => {
   return ChildrenPitch.paginate(
     {},
-    { ...options, populate: ["idParentPitch"] }
+    { ...options, populate: ["idShifts"] }
   );
-  F;
 };
 export const getById = async (id) => {
   return ChildrenPitch.findById(id).populate(["idParentPitch"]);

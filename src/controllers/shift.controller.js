@@ -9,15 +9,33 @@ import "dotenv/config";
 
 export const getAll = async (req, res) => {
   try {
-    const shifts = await shiftModelService.getAll();
+    const shifts = await shiftModelService.getAll(); 
     if (!shifts || shifts.length === 0) {
       return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
     }
-    res.status(200).json(successfully(shifts, "lấy dữ liệu thành công"));
+    
+    const { date } = req.query;
+    if (!date) {
+      return res
+        .status(200)
+        .json(successfully(shifts, "okey"));
+    }
+
+    const filteredShifts = shifts.filter((shift) => shift.date === date);
+    if (filteredShifts.length === 0) {
+      return res
+        .status(404)
+        .json(badRequest(400, "Không có dữ liệu cho ngày này"));
+    }
+
+    res
+    .status(200)
+    .json(successfully(filteredShifts, "lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
+
 
 export const getByID = async (req, res) => {
   try {
@@ -56,25 +74,26 @@ export const create = async (req, res) => {
   }
 };
 
-export const update = async (req, res) => {
-  try {
-    const { error } = shiftValidation.default.validate(req.body);
-    if (error) {
-      return res.status(400).json(badRequest(400, error.details[0].message));
+  export const update = async (req, res) => {
+    try {
+      const { error } = shiftValidation.default.validate(req.body);
+      if (error) {
+        return res.status(400).json(badRequest(400, error.details[0].message));
+      }
+      const shift = await shiftModelService.update(req.params.id, req.body, {
+        new: true,
+      });
+      if (!shift) {
+        return res
+          .status(400)
+          .json(badRequest(400, "Cập nhật không thành công !!!"));
+      }
+      res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
+    } catch (error) {
+      res.status(500).json(serverError(error.message));
     }
-    const shift = await shiftModelService.update(req.params.id, req.body, {
-      new: true,
-    });
-    if (!shift) {
-      return res
-        .status(400)
-        .json(badRequest(400, "Cập nhật không thành công !!!"));
-    }
-    res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
-};
+  };
+
 
 export const remove = async (req, res) => {
   try {

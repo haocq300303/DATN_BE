@@ -8,15 +8,21 @@ const childrenPitchSchema = new mongoose.Schema(
       ref: "Pitch",
       required: true,
     },
-    code_chirldren_pitch: {
+    code_chirldren_pitch: { // mã số sân nhé
       type: Number,
-      required: true,
     },
-    images: {
-      type: Array,
-      default: [],
-    },
+    idShifts: [
+      {
+        type: mongoose.ObjectId,
+        ref: "Shift",
+      },
+    ],
+    
+    date: {
+      type: String,
+    }
   },
+
   { timestamps: true, versionKey: false }
 );
 

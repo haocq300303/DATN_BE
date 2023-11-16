@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 const shiftSchema = new mongoose.Schema({
+    id_chirlden_pitch:{
+       type: String,
+    },
   id_pitch: {
     type: mongoose.ObjectId,
     ref: "Pitch",
