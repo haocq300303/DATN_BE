@@ -4,9 +4,7 @@ const shiftSchema = Joi.object({
     number_shift:Joi.number(),
     time_start :Joi.string().required(),
     time_end :Joi.string().required(),
-    number_remain :Joi.number().required(),
     price : Joi.number().required(),
     statusPitch : Joi.boolean(),
-    date : Joi.string(),
 })
 export default shiftSchema;

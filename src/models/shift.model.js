@@ -15,19 +15,12 @@ const shiftSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    number_remain:{ 
-        type:Number,
-        required:true,
-    },
     price:{
         type: Number,
         required:true,
     },
     statusPitch:{
         type:Boolean
-    },
-    date:{
-        type:String,
     }
 })
 export default mongoose.model("Shift",shiftSchema);
