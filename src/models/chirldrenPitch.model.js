@@ -17,6 +17,7 @@ const childrenPitchSchema = new mongoose.Schema(
         ref: "Shift",
       },
     ],
+    
     date: {
       type: String,
     }
