@@ -11,3 +11,4 @@ export * as shiftController from "./shift.controller";
 export * as locationController from "./location.controller";
 export * as pitchController from "./pitch.controller";
 export * as feedbackController from "./feedback.controller";
+export * as emailController from "./email.controller";
