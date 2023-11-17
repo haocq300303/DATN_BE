@@ -6,27 +6,7 @@ import { chilrenPitchValdation } from "../validations";
 
 export const getAll = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 9,
-      _sort = "createdAt",
-      _order = "asc",
-      ...params
-    } = req.query;
-
-    const options = {
-      page,
-      limit,
-      sort: {
-        [_sort]: _order === "desc" ? -1 : 1,
-      },
-      ...params,
-      customLabels: {
-        docs: "data",
-      },
-    };
-
-    const childrenPitchs = await childrenPitchService.getAll(options);
+    const childrenPitchs = await childrenPitchService.getAll();
     if (!childrenPitchs || childrenPitchs.length === 0) {
       return res.status(400).json(badRequest(400, "Không có sân nào cả"));
     }
@@ -86,10 +66,7 @@ export const update = async (req, res) => {
     }
     const childrenPitch = await childrenPitchService.update(
       req.params.id,
-      req.body,
-      {
-        new: true,
-      }
+      req.body
     );
     if (!childrenPitch) {
       return res
@@ -111,6 +88,25 @@ export const remove = async (req, res) => {
       return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
     }
     res.status(200).json(successfully(childrenPitch, "Xóa thành công !!!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+export const getChildrenPitchsByParent = async (req, res) => {
+  try {
+    const { id: idParentPitch } = req.params;
+
+    const childrenPitchs = await childrenPitchService.getChildrenPitchsByParent(
+      idParentPitch
+    );
+
+    if (!childrenPitchs || childrenPitchs.length === 0) {
+      return res.status(400).json(badRequest(400, "Không dữ liệu!"));
+    }
+    res
+      .status(200)
+      .json(successfully(childrenPitchs, "lấy dữ lệu thành công!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

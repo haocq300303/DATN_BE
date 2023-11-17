@@ -12,7 +12,6 @@ const serviceSchema = new Schema(
       required: true,
     },
     id_Pitch: {
-      default: null,
       type: mongoose.ObjectId,
       ref: "Pitches",
     },
