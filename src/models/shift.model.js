@@ -1,40 +1,49 @@
 import mongoose from "mongoose";
-const shiftSchema = new mongoose.Schema({
-    id_chirlden_pitch:{
-       type: String,
+
+const shiftSchema = new mongoose.Schema(
+  {
+    id_chirlden_pitch: {
+      type: mongoose.ObjectId,
+      ref: "ChildrenPitch",
+      require: true,
     },
-  id_pitch: {
-    type: mongoose.ObjectId,
-    ref: "Pitch",
-    require: true,
+    id_pitch: {
+      type: mongoose.ObjectId,
+      ref: "Pitch",
+      require: true,
+    },
+    number_shift: {
+      type: Number,
+      min: 1,
+      require: true,
+    },
+    start_time: {
+      type: String,
+      required: true,
+    },
+    end_time: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    status_shift: {
+      type: String,
+      enum: ["Booked", "UnBooked"],
+      default: "UnBooked",
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    find_opponent: {
+      type: String,
+      enum: ["Find", "NotFind"],
+      default: "NotFind",
+    },
   },
-  number_shift: {
-    type: Number,
-    require: true,
-  },
-  time_start: {
-    type: String,
-    required: true,
-  },
-  time_end: {
-    type: String,
-    required: true,
-  },
-  number_remain: {
-    type: Number,
-    // required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  statusPitch: {
-    type: Boolean,
-    default: false,
-  },
-  find_opponent: {
-    type: Boolean,
-    default: false,
-  },
-});
+  { timestamps: true, versionKey: false }
+);
 export default mongoose.model("Shift", shiftSchema);

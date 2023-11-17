@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2";
 
 const childrenPitchSchema = new mongoose.Schema(
   {
@@ -8,24 +7,14 @@ const childrenPitchSchema = new mongoose.Schema(
       ref: "Pitch",
       required: true,
     },
-    code_chirldren_pitch: { // mã số sân nhé
+    code_chirldren_pitch: {
       type: Number,
+      min: 1,
+      required: true,
     },
-    idShifts: [
-      {
-        type: mongoose.ObjectId,
-        ref: "Shift",
-      },
-    ],
-    
-    date: {
-      type: String,
-    }
   },
 
   { timestamps: true, versionKey: false }
 );
-
-childrenPitchSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("ChildrenPitch", childrenPitchSchema);

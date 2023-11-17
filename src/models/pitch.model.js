@@ -65,4 +65,4 @@ const PitchSchema = new Schema(
 
 PitchSchema.plugin(mongoosePaginate);
 
-export default mongoose.model("Pitches", PitchSchema);
+export default mongoose.model("Pitch", PitchSchema);
