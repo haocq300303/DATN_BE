@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const locationSchema = Joi.object({
+const pitchSchema = Joi.object({
   name: Joi.string().required(),
   address: Joi.string().required(),
   admin_pitch_id: Joi.string().required(),
@@ -10,10 +10,11 @@ const locationSchema = Joi.object({
   shifts: Joi.array(),
   services: Joi.array(),
   location_id: Joi.string().required(),
+  districts_id: Joi.string().required(),
   deposit_price: Joi.number().required(),
   avatar: Joi.string().required(),
   comment_id: Joi.array(),
   feedback_id: Joi.array(),
 });
 
-export default locationSchema;
+export default pitchSchema;
