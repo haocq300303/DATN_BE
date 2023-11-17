@@ -1,24 +1,27 @@
 import mongoose, { Schema } from "mongoose";
 
-const bannerSchema = new Schema(
+const emailSchema = new Schema(
   {
-    url: {
+    email_to: {
       type: String,
       required: true,
     },
-    title: {
+    subject: {
       type: String,
       required: true,
     },
     content: {
       type: String,
-      required: true,
+      require: true,
+    },
+    html: {
+      type: String,
     },
   },
   {
-    versionKey: false,
     timestamps: true,
+    versionKey: false,
   }
 );
 
-export default mongoose.model("Banner", bannerSchema);
+export default mongoose.model("Email", emailSchema);

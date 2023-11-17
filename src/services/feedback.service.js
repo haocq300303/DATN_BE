@@ -10,6 +10,13 @@ export const getAllFeedback = (options) => {
   );
 };
 
+export const getByOptions = (options) => {
+  const query = {
+    [options.field]: options.payload,
+  };
+  return Feedback.findOne(query);
+};
+
 export const createFeedback = (feedback) => {
   return Feedback.create(feedback);
 };

@@ -35,6 +35,16 @@ const PitchSchema = new Schema(
         ref: "Shift",
       },
     ],
+    services: [
+      {
+        type: mongoose.ObjectId,
+        ref: "Service",
+      },
+    ],
+    districts_id: {
+      type: String,
+      required: true,
+    },
     location_id: {
       type: String,
       required: true,

@@ -10,11 +10,14 @@ export const getAll = async (req, res) => {
   try {
     const {
       page = 1,
-      limit = 10,
+      limit = 7,
       _sort = "createdAt",
       _order = "asc",
       districtId,
       wardId,
+      searchText,
+      minPrice,
+      maxPrice,
       ...params
     } = req.query;
 
@@ -53,6 +56,25 @@ export const getAll = async (req, res) => {
       data.data = newPitchs;
     } else {
       data.data = dataPitch;
+    }
+    // tìm kiếm theo tên và lọc theo giá 
+    if (searchText && (minPrice || maxPrice)) {
+      const filteredPitchs = data.data.filter((item) => {
+        const isNameMatched = item.name.toLowerCase().includes(searchText.toLowerCase());
+        const isPriceMatched = (!minPrice || item.deposit_price >= minPrice) && (!maxPrice || item.deposit_price <= maxPrice);
+        return isNameMatched && isPriceMatched;
+      });
+      data.data = filteredPitchs;
+    } else if (searchText) {
+      const filteredPitchs = data.data.filter((item) =>
+        item.name.toLowerCase().includes(searchText.toLowerCase())
+      );
+      data.data = filteredPitchs;
+    } else if (minPrice || maxPrice) {
+      const filteredPitchs = data.data.filter((item) =>
+        (!minPrice || item.deposit_price >= minPrice) && (!maxPrice || item.deposit_price <= maxPrice)
+      );
+      data.data = filteredPitchs;
     }
 
     res
