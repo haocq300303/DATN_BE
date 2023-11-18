@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2";
 
 const childrenPitchSchema = new mongoose.Schema(
   {
@@ -10,16 +9,12 @@ const childrenPitchSchema = new mongoose.Schema(
     },
     code_chirldren_pitch: {
       type: Number,
+      min: 1,
       required: true,
     },
-    images: {
-      type: Array,
-      default: [],
-    },
   },
+
   { timestamps: true, versionKey: false }
 );
-
-childrenPitchSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("ChildrenPitch", childrenPitchSchema);

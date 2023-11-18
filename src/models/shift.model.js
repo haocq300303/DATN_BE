@@ -1,16 +1,21 @@
 import mongoose from "mongoose";
+
 const shiftSchema = new mongoose.Schema(
   {
+    id_chirlden_pitch: {
+      type: mongoose.ObjectId,
+      ref: "ChildrenPitch",
+      require: true,
+    },
     id_pitch: {
       type: mongoose.ObjectId,
       ref: "Pitch",
-      required: true,
+      require: true,
     },
-    shift_name: {
+    number_shift: {
       type: Number,
       min: 1,
-      required: true,
-      unique: true,
+      require: true,
     },
     start_time: {
       type: String,
@@ -24,11 +29,21 @@ const shiftSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    statusPitch: {
-      type: Boolean,
-      default: false,
+    status_shift: {
+      type: String,
+      enum: ["Booked", "UnBooked"],
+      default: "UnBooked",
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    find_opponent: {
+      type: String,
+      enum: ["Find", "NotFind"],
+      default: "NotFind",
     },
   },
-  { versionKey: false, timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 export default mongoose.model("Shift", shiftSchema);
