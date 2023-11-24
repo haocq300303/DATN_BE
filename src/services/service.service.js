@@ -1,7 +1,7 @@
 import ServiceModel from "../models/service.model";
 
 export const getAll = async () => {
-    return ServiceModel.find().populate('id_Pitch');
+    return ServiceModel.find();
 }
 
 export const getById = async (serviceId) => {
