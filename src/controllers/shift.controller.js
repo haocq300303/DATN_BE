@@ -339,8 +339,7 @@ export const matchOpponent = async (req, res) => {
 export const getAllShiftByChirldrenPitch = async (req, res) => {
   try {
     const { id: id_chirlden_pitch } = req.params;
-    const { id_pitch } = req.body;
-    const { date } = req.query;
+    const { date, id_pitch } = req.query;
 
     const vietnamTimeZone = "Asia/Ho_Chi_Minh";
     const newDate = date ? parseISO(date) : startOfToday(new Date());
