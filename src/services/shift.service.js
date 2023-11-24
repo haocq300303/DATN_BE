@@ -9,6 +9,12 @@ export const getListByOptions = (options) => {
   };
   return shiftModel.find(query);
 };
+export const getListByOptionsPopulate = (options) => {
+  const query = {
+    [options.field]: options.payload,
+  };
+  return shiftModel.find(query).populate("id_pitch");
+};
 export const getById = async (id) => {
   return shiftModel.findById(id);
 };

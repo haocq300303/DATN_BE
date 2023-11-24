@@ -158,7 +158,7 @@ export const find_opponent = async (req, res) => {
 
 export const getAllShiftFindOpponent = async (req, res) => {
   try {
-    const data = await shiftService.getListByOptions({
+    const data = await shiftService.getListByOptionsPopulate({
       field: "find_opponent",
       payload: "Find",
     });
@@ -208,7 +208,7 @@ export const matchOpponent = async (req, res) => {
     const { idUserFindOpponent, email, phone_number, nameUserFindOpponent } =
       req.body;
     // const { _id: id_user } = req.user;
-    const id_user = "653cab898630200154dbe229";
+    const id_user = "655b99001ac3962a68ccf1c5";
     const currentUser = await userService.getById(id_user);
 
     if (id_user !== idUserFindOpponent) {
