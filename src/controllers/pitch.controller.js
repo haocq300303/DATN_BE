@@ -57,11 +57,15 @@ export const getAll = async (req, res) => {
     } else {
       data.data = dataPitch;
     }
-    // tìm kiếm theo tên và lọc theo giá 
+    // tìm kiếm theo tên và lọc theo giá
     if (searchText && (minPrice || maxPrice)) {
       const filteredPitchs = data.data.filter((item) => {
-        const isNameMatched = item.name.toLowerCase().includes(searchText.toLowerCase());
-        const isPriceMatched = (!minPrice || item.deposit_price >= minPrice) && (!maxPrice || item.deposit_price <= maxPrice);
+        const isNameMatched = item.name
+          .toLowerCase()
+          .includes(searchText.toLowerCase());
+        const isPriceMatched =
+          (!minPrice || item.deposit_price >= minPrice) &&
+          (!maxPrice || item.deposit_price <= maxPrice);
         return isNameMatched && isPriceMatched;
       });
       data.data = filteredPitchs;
@@ -71,8 +75,10 @@ export const getAll = async (req, res) => {
       );
       data.data = filteredPitchs;
     } else if (minPrice || maxPrice) {
-      const filteredPitchs = data.data.filter((item) =>
-        (!minPrice || item.deposit_price >= minPrice) && (!maxPrice || item.deposit_price <= maxPrice)
+      const filteredPitchs = data.data.filter(
+        (item) =>
+          (!minPrice || item.deposit_price >= minPrice) &&
+          (!maxPrice || item.deposit_price <= maxPrice)
       );
       data.data = filteredPitchs;
     }
