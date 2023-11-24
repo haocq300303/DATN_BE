@@ -9,225 +9,212 @@ import { endOfDay, format, parseISO, startOfDay, startOfToday } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 
 export const getAll = async (req, res) => {
-  try {
-    const shifts = await shiftService.getAll();
-    if (!shifts || shifts.length === 0) {
-      return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+    try {
+        const shifts = await shiftService.getAll();
+        if (!shifts || shifts.length === 0) {
+            return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+        }
+
+        const newShifts = shifts.map((item) => {
+            if (item.date) {
+                return {
+                    ...item._doc,
+                    date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+                };
+            }
+            return item._doc;
+        });
+
+        res.status(200).json(successfully(newShifts, "lấy dữ liệu thành công"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-
-    const newShifts = shifts.map((item) => {
-      if (item.date) {
-        return {
-          ...item._doc,
-          date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-        };
-      }
-      return item._doc;
-    });
-
-    res.status(200).json(successfully(newShifts, "lấy dữ liệu thành công"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const getByID = async (req, res) => {
-  try {
-    const shift = await shiftService.getById(req.params.id);
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Không có sân nào cả"));
-    }
+    try {
+        const shift = await shiftService.getById(req.params.id);
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Không có sân nào cả"));
+        }
 
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
-    res.status(200).json(successfully(newShift, "lấy dữ lệu thành công"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
+        const newShift = {
+            ...shift._doc,
+            date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        };
+        res.status(200).json(successfully(newShift, "lấy dữ lệu thành công"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
+    }
 };
 
 export const create = async (req, res) => {
-  try {
-    const { date, ...data } = req.body;
-    const vietnamTimeZone = "Asia/Ho_Chi_Minh";
-    const newDate = format(
-      utcToZonedTime(parseISO(date), vietnamTimeZone),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-    );
+    try {
+        const { date, ...data } = req.body;
+        const vietnamTimeZone = "Asia/Ho_Chi_Minh";
+        const newDate = format(utcToZonedTime(parseISO(date), vietnamTimeZone), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-    // const existingShifts = await shiftService.getListByOptions({
-    //   field: "date",
-    //   payload: {
-    //     $gte: startOfDay(parseISO(date)),
-    //     $lt: endOfDay(parseISO(date)),
-    //   },
-    // });
+        // const existingShifts = await shiftService.getListByOptions({
+        //   field: "date",
+        //   payload: {
+        //     $gte: startOfDay(parseISO(date)),
+        //     $lt: endOfDay(parseISO(date)),
+        //   },
+        // });
 
-    // Kiểm tra xem đã có đủ 6 ca chưa
-    // if (existingShifts.length >= 6) {
-    //   return res
-    //     .status(400)
-    //     .json(
-    //       badRequest(400, "Không thể tạo thêm ca vì đã đạt 6 ca cho ngày này.")
-    //     );
-    // }
+        // Kiểm tra xem đã có đủ 6 ca chưa
+        // if (existingShifts.length >= 6) {
+        //   return res
+        //     .status(400)
+        //     .json(
+        //       badRequest(400, "Không thể tạo thêm ca vì đã đạt 6 ca cho ngày này.")
+        //     );
+        // }
 
-    const newData = {
-      date: newDate,
-      ...data,
-    };
+        const newData = {
+            date: newDate,
+            ...data,
+        };
 
-    const { error } = shiftValidation.default.validate(newData);
+        const { error } = shiftValidation.default.validate(newData);
 
-    if (error) {
-      return res.status(400).json(badRequest(400, error.details[0].message));
+        if (error) {
+            return res.status(400).json(badRequest(400, error.details[0].message));
+        }
+
+        const shift = await shiftService.creat(newData);
+
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+        }
+
+        const formattedDate = format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        const newShift = { ...shift._doc, date: formattedDate };
+
+        res.status(200).json(successfully(newShift, "Thêm thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-
-    const shift = await shiftService.creat(newData);
-
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
-    }
-
-    const formattedDate = format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-    const newShift = { ...shift._doc, date: formattedDate };
-
-    res.status(200).json(successfully(newShift, "Thêm thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const update = async (req, res) => {
-  try {
-    // const { error } = shiftValidation.default.validate(req.body);
-    // if (error) {
-    //   return res.status(400).json(badRequest(400, error.details[0].message));
-    // }
-    const shift = await shiftService.update(req.params.id, req.body);
-    if (!shift) {
-      return res
-        .status(400)
-        .json(badRequest(400, "Cập nhật không thành công !!!"));
+    try {
+        // const { error } = shiftValidation.default.validate(req.body);
+        // if (error) {
+        //   return res.status(400).json(badRequest(400, error.details[0].message));
+        // }
+        const shift = await shiftService.update(req.params.id, req.body);
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Cập nhật không thành công !!!"));
+        }
+        const newShift = {
+            ...shift._doc,
+            date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        };
+        res.status(200).json(successfully(newShift, "Cập nhật thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
-    res.status(200).json(successfully(newShift, "Cập nhật thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const remove = async (req, res) => {
-  try {
-    const shift = await shiftService.remove(req.params.id);
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
-    }
+    try {
+        const shift = await shiftService.remove(req.params.id);
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
+        }
 
-    res.status(200).json(successfully(shift, "Xóa thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
+        res.status(200).json(successfully(shift, "Xóa thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
+    }
 };
 
 export const find_opponent = async (req, res) => {
-  try {
-    const { id: shift_id } = req.params;
+    try {
+        const { id: shift_id } = req.params;
 
-    const shift = await shiftService.update(shift_id, req.body);
+        const shift = await shiftService.update(shift_id, req.body);
 
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
+        }
+        const newShift = {
+            ...shift._doc,
+            date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        };
+        res.status(200).json(successfully(newShift, "Thay đổi dữ liệu thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
-    res
-      .status(200)
-      .json(successfully(newShift, "Thay đổi dữ liệu thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const getAllShiftFindOpponent = async (req, res) => {
-  try {
-    const data = await shiftService.getListByOptions({
-      field: "find_opponent",
-      payload: "Find",
-    });
+    try {
+        const data = await shiftService.getListByOptions({
+            field: "find_opponent",
+            payload: "Find",
+        });
 
-    if (!data || data.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+        if (!data || data.length === 0) {
+            return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+        }
+        const newShifts = data.map((item) => ({
+            ...item._doc,
+            date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        }));
+
+        res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-    const newShifts = data.map((item) => ({
-      ...item._doc,
-      date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    }));
-
-    res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const getAllShiftFindOpponentByPitch = async (req, res) => {
-  try {
-    const { id: id_pitch } = req.params;
+    try {
+        const { id: id_pitch } = req.params;
 
-    const data = await shiftService.getListByOptions({
-      field: "id_pitch",
-      payload: id_pitch,
-    });
+        const data = await shiftService.getListByOptions({
+            field: "id_pitch",
+            payload: id_pitch,
+        });
 
-    if (!data || data.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+        if (!data || data.length === 0) {
+            return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+        }
+
+        const newData = data.filter((item) => item.find_opponent === "Find");
+
+        const newShifts = newData.map((item) => ({
+            ...item._doc,
+            date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        }));
+
+        res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-
-    const newData = data.filter((item) => item.find_opponent === "Find");
-
-    const newShifts = newData.map((item) => ({
-      ...item._doc,
-      date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    }));
-
-    res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const matchOpponent = async (req, res) => {
-  try {
-    const { idUserFindOpponent, email, phone_number, nameUserFindOpponent } =
-      req.body;
-    // const { _id: id_user } = req.user;
-    const id_user = "653cab898630200154dbe229";
-    const currentUser = await userService.getById(id_user);
+    try {
+        const { idUserFindOpponent, email, phone_number, nameUserFindOpponent } = req.body;
+        // const { _id: id_user } = req.user;
+        const id_user = "653cab898630200154dbe229";
+        const currentUser = await userService.getById(id_user);
 
-    if (id_user !== idUserFindOpponent) {
-      if (email) {
-        const sendEmail = async (
-          nameUserSendEmail,
-          email,
-          name,
-          phone_number
-        ) => {
-          await transporter.sendMail({
-            from: {
-              name: "FSport",
-              address: process.env.USER_EMAIL,
-            },
-            to: email,
-            subject: "Đã tìm được đối sân bóng!",
-            text: `Chào ${nameUserSendEmail}. Bạn đã tìm được đối bóng. Họ và Tên: ${name}  -  SĐT: ${phone_number}. Vui lòng liên lạc để ghép kèo!`,
-            html: `
+        if (id_user !== idUserFindOpponent) {
+            if (email) {
+                const sendEmail = async (nameUserSendEmail, email, name, phone_number) => {
+                    await transporter.sendMail({
+                        from: {
+                            name: "FSport",
+                            address: process.env.USER_EMAIL,
+                        },
+                        to: email,
+                        subject: "Đã tìm được đối sân bóng!",
+                        text: `Chào ${nameUserSendEmail}. Bạn đã tìm được đối bóng. Họ và Tên: ${name}  -  SĐT: ${phone_number}. Vui lòng liên lạc để ghép kèo!`,
+                        html: `
             <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -300,274 +287,221 @@ export const matchOpponent = async (req, res) => {
         </div>
       </body>
       </html>`,
-          });
-        };
+                    });
+                };
 
-        // Gửi Email cho user ấn ghép kèo
-        sendEmail(
-          currentUser.name,
-          currentUser.email,
-          nameUserFindOpponent,
-          phone_number
-        );
+                // Gửi Email cho user ấn ghép kèo
+                sendEmail(currentUser.name, currentUser.email, nameUserFindOpponent, phone_number);
 
-        // Gửi Email cho user tìm kèo
-        sendEmail(
-          nameUserFindOpponent,
-          email,
-          currentUser.name,
-          currentUser.phone_number
-        );
+                // Gửi Email cho user tìm kèo
+                sendEmail(nameUserFindOpponent, email, currentUser.name, currentUser.phone_number);
 
-        res.status(200).json({
-          error: false,
-          meassge: "Gửi Email thành công!",
-        });
-      } else {
-        res.status(400).json(badRequest(400, "Không có email!"));
-      }
-    } else {
-      res
-        .status(400)
-        .json(badRequest(400, "Bạn không thể tự ghép kèo với mình!"));
+                res.status(200).json({
+                    error: false,
+                    meassge: "Gửi Email thành công!",
+                });
+            } else {
+                res.status(400).json(badRequest(400, "Không có email!"));
+            }
+        } else {
+            res.status(400).json(badRequest(400, "Bạn không thể tự ghép kèo với mình!"));
+        }
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const getAllShiftByChirldrenPitch = async (req, res) => {
-  try {
-    const { id: id_chirlden_pitch } = req.params;
-    const { id_pitch } = req.body;
-    const { date } = req.query;
+    try {
+        const { id: id_chirlden_pitch } = req.params;
+        const { date, id_pitch } = req.query;
 
-    const vietnamTimeZone = "Asia/Ho_Chi_Minh";
-    const newDate = date ? parseISO(date) : startOfToday(new Date());
+        const vietnamTimeZone = "Asia/Ho_Chi_Minh";
+        const newDate = date ? parseISO(date) : startOfToday(new Date());
 
-    const formattedStartDate = format(
-      utcToZonedTime(newDate, vietnamTimeZone),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-    );
+        const formattedStartDate = format(utcToZonedTime(newDate, vietnamTimeZone), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-    const formattedEndDate = format(
-      utcToZonedTime(endOfDay(newDate), vietnamTimeZone),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-    );
+        const formattedEndDate = format(utcToZonedTime(endOfDay(newDate), vietnamTimeZone), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-    const shiftsDefault = await shiftService.getListByOptions({
-      field: "$and",
-      payload: [{ default: true }, { id_pitch }],
-    });
+        const shiftsDefault = await shiftService.getListByOptions({
+            field: "$and",
+            payload: [{ default: true }, { id_pitch }],
+        });
 
-    if (!shiftsDefault || shiftsDefault.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+        if (!shiftsDefault || shiftsDefault.length === 0) {
+            return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+        }
+
+        const shifts = await shiftService.getListByOptions({
+            field: "$and",
+            payload: [{ date: { $gte: formattedStartDate, $lt: formattedEndDate } }, { id_chirlden_pitch }],
+        });
+
+        if (!shifts || shifts.length === 0) {
+            return res.status(200).json(successfully(shiftsDefault, "lấy dữ lệu thành công!"));
+        }
+
+        const newShifts = shifts.map((item) => ({
+            ...item._doc,
+            date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        }));
+
+        const results = shiftsDefault.map((item) => ({
+            ...item._doc,
+            id_chirlden_pitch,
+            date: format(newDate, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+            status_shift: !!newShifts.find((shift) => shift.number_shift === item.number_shift),
+            default: !newShifts.find((shift) => shift.number_shift === item.number_shift),
+            _id: (newShifts.find((shift) => shift.number_shift === item.number_shift) || item)._id,
+        }));
+        res.status(200).json(successfully(results, "lấy dữ lệu thành công!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-
-    const shifts = await shiftService.getListByOptions({
-      field: "$and",
-      payload: [
-        { date: { $gte: formattedStartDate, $lt: formattedEndDate } },
-        { id_chirlden_pitch },
-      ],
-    });
-
-    if (!shifts || shifts.length === 0) {
-      return res
-        .status(200)
-        .json(successfully(shiftsDefault, "lấy dữ lệu thành công!"));
-    }
-
-    const newShifts = shifts.map((item) => ({
-      ...item._doc,
-      date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    }));
-
-    const results = shiftsDefault.map((item) => ({
-      ...item._doc,
-      id_chirlden_pitch,
-      date: format(newDate, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-      status_shift: !!newShifts.find(
-        (shift) => shift.number_shift === item.number_shift
-      ),
-      default: !newShifts.find(
-        (shift) => shift.number_shift === item.number_shift
-      ),
-      _id: (
-        newShifts.find((shift) => shift.number_shift === item.number_shift) ||
-        item
-      )._id,
-    }));
-    res.status(200).json(successfully(results, "lấy dữ lệu thành công!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const changeStatusShift = async (req, res) => {
-  try {
-    const { id: shift_id } = req.params;
-    const { status_shift } = req.body;
+    try {
+        const { id: shift_id } = req.params;
+        const { status_shift } = req.body;
 
-    const shift = await shiftService.update(shift_id, { status_shift });
+        const shift = await shiftService.update(shift_id, { status_shift });
 
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
+        }
+        const newShift = {
+            ...shift._doc,
+            date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+        };
+        res.status(200).json(successfully(newShift, "Thay đổi dữ liệu thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
-    res
-      .status(200)
-      .json(successfully(newShift, "Thay đổi dữ liệu thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const createShiftDefault = async (req, res) => {
-  try {
-    const data = req.body;
+    try {
+        const data = req.body;
 
-    const { error } = shiftValidation.default.validate(data);
+        const { error } = shiftValidation.default.validate(data);
 
-    if (error) {
-      return res.status(400).json(badRequest(400, error.details[0].message));
+        if (error) {
+            return res.status(400).json(badRequest(400, error.details[0].message));
+        }
+
+        const shift = await shiftService.creat(data);
+
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+        }
+
+        res.status(200).json(successfully(shift, "Thêm thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-
-    const shift = await shiftService.creat(data);
-
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
-    }
-
-    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const updateShiftDefault = async (req, res) => {
-  try {
-    // const { error } = shiftValidation.default.validate(req.body);
-    // if (error) {
-    //   return res.status(400).json(badRequest(400, error.details[0].message));
-    // }
-    const shift = await shiftService.update(req.params.id, req.body);
-    if (!shift) {
-      return res
-        .status(400)
-        .json(badRequest(400, "Cập nhật không thành công !!!"));
-    }
+    try {
+        // const { error } = shiftValidation.default.validate(req.body);
+        // if (error) {
+        //   return res.status(400).json(badRequest(400, error.details[0].message));
+        // }
+        const shift = await shiftService.update(req.params.id, req.body);
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Cập nhật không thành công !!!"));
+        }
 
-    res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
+        res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
+    }
 };
 
 export const deleteShiftDefault = async (req, res) => {
-  try {
-    const shift = await shiftService.remove(req.params.id);
-    if (!shift) {
-      return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
-    }
+    try {
+        const shift = await shiftService.remove(req.params.id);
+        if (!shift) {
+            return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
+        }
 
-    res.status(200).json(successfully(shift, "Xóa thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
+        res.status(200).json(successfully(shift, "Xóa thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
+    }
 };
 
 export const getAllShiftDefaultByPitch = async (req, res) => {
-  try {
-    const { id: id_pitch } = req.params;
+    try {
+        const { id: id_pitch } = req.params;
 
-    const shifts = await shiftService.getListByOptions({
-      field: "$and",
-      payload: [{ default: true }, { id_pitch }],
-    });
+        const shifts = await shiftService.getListByOptions({
+            field: "$and",
+            payload: [{ default: true }, { id_pitch }],
+        });
 
-    if (!shifts || shifts.length === 0) {
-      return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+        if (!shifts || shifts.length === 0) {
+            return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+        }
+
+        res.status(200).json(successfully(shifts, "lấy dữ lệu thành công!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-
-    res.status(200).json(successfully(shifts, "lấy dữ lệu thành công!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
 
 export const bookMultipleDay = async (req, res) => {
-  try {
-    const shifts = req.body;
+    try {
+        const shifts = req.body;
 
-    if (!Array.isArray(shifts)) {
-      return res.status(400).json(badRequest(400, "No shifts were uploaded!"));
+        if (!Array.isArray(shifts)) {
+            return res.status(400).json(badRequest(400, "No shifts were uploaded!"));
+        }
+        const vietnamTimeZone = "Asia/Ho_Chi_Minh";
+
+        for (const item of shifts) {
+            const formattedStartDate = format(utcToZonedTime(parseISO(item.date), vietnamTimeZone), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+            const formattedEndDate = format(utcToZonedTime(endOfDay(parseISO(item.date)), vietnamTimeZone), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+            const bookedShifts = await shiftService.getListByOptions({
+                field: "$and",
+                payload: [
+                    { date: { $gte: formattedStartDate, $lt: formattedEndDate } },
+                    { id_chirlden_pitch: item.id_chirlden_pitch },
+                    { number_shift: item.number_shift },
+                ],
+            });
+
+            if (!bookedShifts || bookedShifts.length > 0) {
+                return res.status(400).json(badRequest(400, "Trong số ca bạn đặt đã có ca được đặt trước đó!! Vui lòng chọn ca khác!!!"));
+            }
+        }
+
+        const results = [];
+        for (const shiftItem of shifts) {
+            shiftItem.date = format(utcToZonedTime(parseISO(shiftItem.date), vietnamTimeZone), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+            const { error } = shiftValidation.default.validate(shiftItem);
+
+            if (error) {
+                return res.status(400).json(badRequest(400, error.details[0].message));
+            }
+
+            const shift = await shiftService.creat(shiftItem);
+
+            if (!shift) {
+                return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+            }
+
+            const formattedDate = format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+            results.push({ ...shift._doc, date: formattedDate });
+        }
+
+        res.status(200).json(successfully(results, "Thêm thành công !!!"));
+    } catch (error) {
+        res.status(500).json(serverError(error.message));
     }
-    const vietnamTimeZone = "Asia/Ho_Chi_Minh";
-
-    for (const item of shifts) {
-      const formattedStartDate = format(
-        utcToZonedTime(parseISO(item.date), vietnamTimeZone),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-      );
-
-      const formattedEndDate = format(
-        utcToZonedTime(endOfDay(parseISO(item.date)), vietnamTimeZone),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-      );
-
-      const bookedShifts = await shiftService.getListByOptions({
-        field: "$and",
-        payload: [
-          { date: { $gte: formattedStartDate, $lt: formattedEndDate } },
-          { id_chirlden_pitch: item.id_chirlden_pitch },
-          { number_shift: item.number_shift },
-        ],
-      });
-
-      if (!bookedShifts || bookedShifts.length > 0) {
-        return res
-          .status(400)
-          .json(
-            badRequest(
-              400,
-              "Trong số ca bạn đặt đã có ca được đặt trước đó!! Vui lòng chọn ca khác!!!"
-            )
-          );
-      }
-    }
-
-    const results = [];
-    for (const shiftItem of shifts) {
-      shiftItem.date = format(
-        utcToZonedTime(parseISO(shiftItem.date), vietnamTimeZone),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-      );
-
-      const { error } = shiftValidation.default.validate(shiftItem);
-
-      if (error) {
-        return res.status(400).json(badRequest(400, error.details[0].message));
-      }
-
-      const shift = await shiftService.creat(shiftItem);
-
-      if (!shift) {
-        return res
-          .status(400)
-          .json(badRequest(400, "Thêm không thành công !!!"));
-      }
-
-      const formattedDate = format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
-      results.push({ ...shift._doc, date: formattedDate });
-    }
-
-    res.status(200).json(successfully(results, "Thêm thành công !!!"));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
 };
