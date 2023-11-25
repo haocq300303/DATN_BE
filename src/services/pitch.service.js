@@ -6,7 +6,7 @@ export const getAllPitch = async (options) => {
     {},
     {
       ...options,
-      populate: ["admin_pitch_id", "shifts","services" , "location_id"],
+      populate: ["admin_pitch_id", "shifts", "services", "location_id", "feedback_id"],
     }
   );
 };

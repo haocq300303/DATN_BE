@@ -13,7 +13,7 @@ const serviceSchema = new Schema(
     },
     id_Pitch: {
       type: mongoose.ObjectId,
-      ref: "Pitches",
+      ref: "Pitch",
     },
     image: {
       type: String,
