@@ -4,6 +4,7 @@ import { successfully } from "../formatResponse/successfully";
 import Pitch from "../models/pitch.model";
 import { feedbackValidation } from "../validations";
 import { feedbackService } from "../services";
+import Feedback from "../models/feedback.model";
 
 // Get All Feedback
 export const getAllFeedback = async (req, res) => {
@@ -43,8 +44,17 @@ export const getAllFeedback = async (req, res) => {
 // Create Feedback
 export const createFeedback = async (req, res) => {
   try {
-    const { _id: id_user } = req.user;
+    console.log("reqUsser:", req.user);
+    const id_user = req.body.id_user;
+    const id_pitch = req.body.id_pitch;
+    // Kiểm tra xem id_user đã đánh giá id_pitch trước đó chưa
+    const existingFeedback = await Feedback.findOne({ id_user, id_pitch });
+    console.log("kiểm tra:", existingFeedback);
+    if (existingFeedback) {
+      return res.status(400).json(badRequest(400, "Bạn đã đánh giá rồi!"));
+    }
 
+    // Tiếp tục tạo đánh giá
     const { error } = feedbackValidation.default.validate(
       { id_user, ...req.body },
       {
@@ -61,16 +71,37 @@ export const createFeedback = async (req, res) => {
       id_user,
       ...req.body,
     });
-
     if (!feedback) {
       return res.status(400).json(badRequest(400, "Đánh giá thất bại!"));
     }
-
+    // Cập nhật feedback_id trong Pitch
     await Pitch.findByIdAndUpdate(feedback.id_pitch, {
       $addToSet: { feedback_id: feedback._id },
     });
 
     res.status(200).json(successfully(feedback, "Đánh giá thành công"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+// Tính tổng star user
+export const totalStarByUser = async (req, res) => {
+  try {
+    const { id_pitch } = req.params;
+
+    const feedbacks = await Feedback.find({ id_pitch });
+
+
+    let totalQuantityStar = 0;
+    feedbacks.forEach((feedback) => {
+      totalQuantityStar += feedback.quantity_star;
+    });
+
+    const numberOfFeedbacks = feedbacks.length;
+    const averageRating = numberOfFeedbacks > 0 ? totalQuantityStar / numberOfFeedbacks : 0;
+
+    res.status(200).json(successfully({ averageRating }, "Tính tổng số lượng sao thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
