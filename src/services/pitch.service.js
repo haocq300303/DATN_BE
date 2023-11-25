@@ -6,13 +6,17 @@ export const getAllPitch = async (options) => {
     {},
     {
       ...options,
-      populate: ["admin_pitch_id", "shifts", "services", "location_id", "feedback_id"],
+      populate: ["admin_pitch_id", "shifts", "services", "location_id"],
     }
   );
 };
 export const getOnePitch = async (pitchId) => {
   try {
-    const pitch = await Pitch.findById(pitchId);
+    const pitch = await Pitch.findById(pitchId).populate([
+      "admin_pitch_id",
+      "services",
+    ]);
+
     if (!pitch) {
       throw new Error("Không tìm thấy sân bóng");
     }

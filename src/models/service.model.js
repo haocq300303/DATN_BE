@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-
 const serviceSchema = new Schema(
   {
     name: {
