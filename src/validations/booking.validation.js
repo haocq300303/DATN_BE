@@ -7,6 +7,7 @@ export const validation = (req, res, next) => {
         shift_id: Joi.string().required(),
         children_pitch_id: Joi.string().required(),
         payment_id: Joi.string().required(),
+        service_ids: Joi.array().items(Joi.string()),
     });
 
     const result = schema.validate(req.body);

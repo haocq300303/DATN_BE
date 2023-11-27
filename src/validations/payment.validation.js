@@ -5,7 +5,8 @@ export const validation = (req, res, next) => {
         payment_method: Joi.string().required(),
         user_bank: Joi.string().required(),
         user_receiver: Joi.string().required(),
-        price: Joi.number().required(),
+        price_received: Joi.number().required(),
+        total_received: Joi.number().required(),
         status: Joi.string().required(),
         message: Joi.string().required(),
     });

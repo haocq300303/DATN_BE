@@ -3,11 +3,19 @@ import BookingModel from "../models/booking.model";
 
 const pipeLine = [
     {
+        $unwind: {
+            path: "$service_ids",
+            preserveNullAndEmptyArrays: true, 
+        },
+    },
+    {
         $addFields: {
             userId: { $toObjectId: "$user_id" },
             pitchId: { $toObjectId: "$pitch_id" },
             paymentId: { $toObjectId: "$payment_id" },
             shiftId: { $toObjectId: "$shift_id" },
+            childrenPitchId: { $toObjectId: "$children_pitch_id" },
+            serviceIds: { $toObjectId: "$service_ids" },
         },
     },
     {
@@ -20,6 +28,17 @@ const pipeLine = [
     },
     {
         $unwind: { path: "$user", preserveNullAndEmptyArrays: true },
+    },
+    {
+        $lookup: {
+            from: "childrenpitches",
+            localField: "childrenPitchId",
+            foreignField: "_id",
+            as: "childrenPitch",
+        },
+    },
+    {
+        $unwind: { path: "$childrenPitch", preserveNullAndEmptyArrays: true },
     },
     {
         $lookup: {
@@ -55,14 +74,38 @@ const pipeLine = [
         $unwind: { path: "$shift", preserveNullAndEmptyArrays: true },
     },
     {
+        $lookup: {
+            from: "services",
+            localField: "serviceIds",
+            foreignField: "_id",
+            as: "services",
+        },
+    },
+    {
+        $group: {
+            _id: "$_id",
+            fields: { $first: "$$ROOT" },
+            services: { $push: { $arrayElemAt: ["$services", 0] } },
+        },
+    },
+    {
+        $replaceRoot: {
+            newRoot: {
+                $mergeObjects: ["$fields", { services: "$services" }],
+            },
+        },
+    },
+    {
         $project: {
             user_id: 1,
             user_booking: {
                 _id: "$user._id",
                 name: "$user.name",
                 email: "$user.email",
+                phone: "$user.phone",
             },
             payment_id: 1,
+            pitch_id: 1,
             pitch: {
                 _id: "$pitch._id",
                 name: "$pitch.name",
@@ -80,8 +123,29 @@ const pipeLine = [
                 message: "$payment.message",
             },
             status: 1,
+            pitch_code: "$childrenPitch.code_chirldren_pitch",
             shift_id: 1,
-            shift: 1,
+            shift: {
+                _id: "$shift._id",
+                number_shift: "$shift.number_shift",
+                start_time: "$shift.start_time",
+                end_time: "$shift.end_time",
+                price: "$shift.price",
+                status_shift: "$shift.status_shift",
+                find_opponent: "$shift.find_opponent",
+            },
+            services: {
+                $map: {
+                    input: "$services",
+                    as: "item",
+                    in: {
+                        _id: "$$item._id",
+                        name: "$$item.name",
+                        image: "$$item.image",
+                        price: "$$item.price",
+                    },
+                },
+            },
             createdAt: 1,
             updatedAt: 1,
         },
@@ -100,6 +164,14 @@ export const getList = async (options) => {
             $match: filter,
         },
         ...pipeLine,
+        // {
+        //     $match: {
+        //         "user_booking.name": {
+        //             $regex: "hii",
+        //             $options: "i",
+        //         },
+        //     },
+        // },
         {
             $sort: sort,
         },
@@ -119,10 +191,10 @@ export const getOne = async (condition) => {
 export const getByField = async (field) => {
     const { _id, ...obj } = field;
     let condition = [{ $match: obj }];
+
     if (_id) {
         condition = [{ $match: { _id: new mongoose.Types.ObjectId(_id) } }];
     }
-    console.log(condition);
     const result = await BookingModel.aggregate([...condition, ...pipeLine]);
 
     return result.length > 0 ? result[0] : null;
