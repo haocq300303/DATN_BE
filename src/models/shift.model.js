@@ -5,7 +5,6 @@ const shiftSchema = new mongoose.Schema(
     id_chirlden_pitch: {
       type: mongoose.ObjectId,
       ref: "ChildrenPitch",
-      require: true,
     },
     id_pitch: {
       type: mongoose.ObjectId,
@@ -36,12 +35,15 @@ const shiftSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
-      required: true,
     },
     find_opponent: {
       type: String,
       enum: ["Find", "NotFind"],
       default: "NotFind",
+    },
+    default: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true, versionKey: false }

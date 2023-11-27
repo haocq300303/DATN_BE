@@ -15,4 +15,6 @@ routerFeedback.put("/:idFeedback", feedbackController.updateFeedback);
 // Delete Feedback
 routerFeedback.delete("/:idFeedback", feedbackController.deleteFeedback);
 
+routerFeedback.get("/totalStarByPitch/:id_pitch", feedbackController.totalStarByUser);
+
 export default routerFeedback;
