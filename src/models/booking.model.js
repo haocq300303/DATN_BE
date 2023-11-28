@@ -8,6 +8,7 @@ const Booking = new Schema(
         shift_id: { type: String, require: true },
         children_pitch_id: { type: String, require: true },
         payment_id: { type: String, require: true },
+        service_ids: [{ type: String }],
         status: { type: String, require: true, enum: ["success", "cancel"], default: "success" },
         //success - đặt lịch thành công, cancel: user hủy đặt lịch
     },
