@@ -13,5 +13,7 @@ routerPitch.post("/", pitchController.create);
 routerPitch.put("/:id", pitchController.update);
 // DELETE
 routerPitch.delete("/:id", pitchController.remove);
+//filter feedback
+routerPitch.get("/filter/feedback", pitchController.filterFeedBack);
 
 export default routerPitch;
