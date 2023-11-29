@@ -1,17 +1,33 @@
-import express from "express";
-import { pitchController } from "../controllers";
+import express from 'express';
+import { pitchController } from '../controllers';
+import { authMiddleware } from '../middlewares';
 
 const routerPitch = express.Router();
 
 // GET ALL
-routerPitch.get("/", pitchController.getAll);
+routerPitch.get('/', pitchController.getAll);
 // GET ById
-routerPitch.get("/:id", pitchController.getById);
+routerPitch.get('/:id', pitchController.getById);
 // CREATE
-routerPitch.post("/", pitchController.create);
+routerPitch.post(
+  '/',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyAdminPitch,
+  pitchController.create
+);
 // UPDATE
-routerPitch.put("/:id", pitchController.update);
+routerPitch.put(
+  '/:id',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyAdminPitch,
+  pitchController.update
+);
 // DELETE
-routerPitch.delete("/:id", pitchController.remove);
+routerPitch.delete(
+  '/:id',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyAdminPitch,
+  pitchController.remove
+);
 
 export default routerPitch;
