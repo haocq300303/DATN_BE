@@ -1,5 +1,6 @@
 import express from 'express';
 import { commentController } from '../controllers';
+import { authMiddleware } from '../middlewares';
 
 const routerComment = express.Router();
 
