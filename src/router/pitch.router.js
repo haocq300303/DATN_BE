@@ -10,24 +10,22 @@ routerPitch.get('/', pitchController.getAll);
 routerPitch.get('/:id', pitchController.getById);
 // CREATE
 routerPitch.post(
-  '/',
-  authMiddleware.verifyToken,
-  authMiddleware.verifyAdminPitch,
-  pitchController.create
+    '/',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyAdminPitch,
+    pitchController.create
 );
 // UPDATE
 routerPitch.put(
-  '/:id',
-  authMiddleware.verifyToken,
-  authMiddleware.verifyAdminPitch,
-  pitchController.update
+    '/:id',
+    authMiddleware.verifyToken,
+    authMiddleware.verifyAdminPitch,
+    pitchController.update
 );
 // DELETE
-routerPitch.delete(
-  '/:id',
-  authMiddleware.verifyToken,
-  authMiddleware.verifyAdminPitch,
-  pitchController.remove
-);
+routerPitch.delete("/:id", pitchController.remove);
+//filter feedback
+routerPitch.get("/filter/feedback", pitchController.filterFeedBack);
+
 
 export default routerPitch;
