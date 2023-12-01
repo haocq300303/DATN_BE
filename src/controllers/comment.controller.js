@@ -75,7 +75,8 @@ export const getCommentByPost = async (req, res) => {
 // Create Comment
 export const createComment = async (req, res) => {
   try {
-    const { _id: id_user } = req.user;
+    // const { _id: id_user } = req.user;
+    const id_user = "655c53ed6c0689551d7528a3"
 
     const { error } = commentValidation.default.validate(
       { id_user, ...req.body },

@@ -4,7 +4,6 @@ import { postMiddleware } from "../middlewares";
 
 const postSchema = new Schema(
   {
-    id_user: { type: mongoose.ObjectId, ref: "User", require: true },
     title: { type: String, require: true },
     description: { type: String, require: true },
     images: [{ type: String, required: true }],
