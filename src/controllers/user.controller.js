@@ -2,7 +2,7 @@ import { firebase } from '../config/firebase';
 import { badRequest } from '../formatResponse/badRequest';
 import { serverError } from '../formatResponse/serverError';
 import { successfully } from '../formatResponse/successfully';
-import { otpService, userService } from '../services';
+import { otpService, roleService, userService } from '../services';
 import { generateOtp } from '../utils/generateOtp';
 import { generateToken } from '../utils/generateToken';
 import { sendOtp } from '../utils/sendOtp';
@@ -84,7 +84,17 @@ export const login = async (req, res) => {
       return res.status(400).json(badRequest(400, 'Mật khẩu không hợp lệ!!!'));
     }
 
-    const token = await generateToken({ ...user });
+    const role = await roleService.getById(user.role_id);
+    const values = {
+      _id: user._id,
+      name: user.name,
+      role_id: user.role_id,
+      email: user.email,
+      createAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      role_name: role.name,
+    };
+    const token = await generateToken(values);
     res.status(200).json(successfully({ accessToken: token }));
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -99,10 +109,20 @@ export const loginWithGoogle = async (req, res) => {
       field: 'email',
       payload: decodedToken.email,
     });
+    const role = await roleService.getById(
+      user.role_id || '655b87021ac3962a68ccf1b5'
+    );
     if (checkUser) {
-      const token = await generateToken({
-        ...checkUser,
-      });
+      const values = {
+        _id: checkUser._id,
+        name: checkUser.name,
+        role_id: checkUser.role_id,
+        email: checkUser.email,
+        createAt: checkUser.createdAt,
+        updatedAt: checkUser.updatedAt,
+        role_name: role.name,
+      };
+      const token = await generateToken(values);
       return res.status(200).json({
         error: false,
         message: 'Đăng nhập thành công',
@@ -114,7 +134,16 @@ export const loginWithGoogle = async (req, res) => {
         name: decodedToken.name,
         role_id: '655b87021ac3962a68ccf1b5',
       });
-      const token = await generateToken({ ...newUser });
+      const values = {
+        _id: newUser._id,
+        name: newUser.name,
+        role_id: newUser.role_id,
+        email: newUser.email,
+        createAt: newUser.createdAt,
+        updatedAt: newUser.updatedAt,
+        role_name: role.name,
+      };
+      const token = await generateToken(values);
       return res.status(200).json({
         error: false,
         message: 'Đăng nhập thành công',
@@ -184,7 +213,21 @@ export const verifyOtp = async (req, res) => {
     } else if (otpForUser.expireAt < Date.now()) {
       return res.status(400).json(badRequest(400, 'Mã xác minh đã hết hạn'));
     } else {
-      const token = await generateToken({ ...userForPhone });
+      const userForPhone = await userService.getByOptions({
+        field: 'phone_number',
+        payload: phone_number,
+      });
+      const role = await roleService.getById(userForPhone.role_id);
+      const values = {
+        _id: userForPhone._id,
+        name: userForPhone.name,
+        role_id: userForPhone.role_id,
+        email: userForPhone.email,
+        createAt: userForPhone.createdAt,
+        updatedAt: userForPhone.updatedAt,
+        role_name: role.name,
+      };
+      const token = await generateToken(values);
       return res.status(200).json({
         error: false,
         message: 'Tài khoản đã xác minh thành công',
