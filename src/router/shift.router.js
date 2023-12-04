@@ -29,6 +29,8 @@ routerShift.delete("/default/:id", shiftController.deleteShiftDefault);
 
 // Find Opponent
 routerShift.put("/find-opponent/:id", shiftController.find_opponent);
+// Find Opponent
+routerShift.put("/find-opponent-change/:id", shiftController.changeFindOpponent);
 
 // Match Opponent
 routerShift.post("/match-opponent", shiftController.matchOpponent);
