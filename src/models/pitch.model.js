@@ -29,12 +29,6 @@ const PitchSchema = new Schema(
       type: String,
       required: true,
     },
-    shifts: [
-      {
-        type: mongoose.ObjectId,
-        ref: "Shift",
-      },
-    ],
     services: [
       {
         type: mongoose.ObjectId,

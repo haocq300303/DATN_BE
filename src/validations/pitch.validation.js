@@ -7,7 +7,6 @@ const pitchSchema = Joi.object({
   images: Joi.array().items(Joi.string()).required(),
   numberPitch: Joi.number().required(),
   description: Joi.string().required(),
-  shifts: Joi.array(),
   services: Joi.array(),
   location_id: Joi.string().required(),
   districts_id: Joi.string().required(),

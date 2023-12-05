@@ -60,4 +60,16 @@ routerShift.get(
 // Book multiple day
 routerShift.post("/book-multiple-day", shiftController.bookMultipleDay);
 
+// Book One Shift Full Month
+routerShift.post(
+  "/book-one-shift-full-month",
+  shiftController.bookOneShiftFullMonth
+);
+
+// Book Children Picth Full Month
+routerShift.post(
+  "/book-childrenPicth-full-month",
+  shiftController.bookChildrenPicthFullMonth
+);
+
 export default routerShift;
