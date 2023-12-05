@@ -5,13 +5,13 @@ export const getAllPost = (options) => {
     {},
     {
       ...options,
-      populate: ["comment_id", "id_user"],
+      populate: ["comment_id", "comment_id.id_user",],
     }
   );
 };
 
 export const getPost = (idPost) => {
-  return Post.findById(idPost).populate(["comment_id", "id_user"]);
+  return Post.findById(idPost).populate(["comment_id",]);
 };
 
 export const getPostByUser = (id_user) => {
