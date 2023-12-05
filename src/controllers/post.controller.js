@@ -9,7 +9,7 @@ export const getAllPost = async (req, res) => {
   try {
     const {
       page = 1,
-      limit = 9,
+      limit = 8,
       _sort = "createdAt",
       _order = "asc",
       ...params
@@ -72,10 +72,12 @@ export const getPostByUser = async (req, res) => {
 // Create Post
 export const createPost = async (req, res) => {
   try {
-    const { _id: id_user } = req.user;
+    // const { _id: id_user } = req.user;
+    const id_user = "655c53ed6c0689551d7528a3"
+    console.log("id_user", req.user);
 
     const { error } = postValidation.default.validate(
-      { id_user, ...req.body },
+      { ...req.body },
       {
         abortEarly: false,
       }
@@ -86,7 +88,7 @@ export const createPost = async (req, res) => {
       return res.status(400).json(badRequest(400, errors));
     }
 
-    const post = await postService.createPost({ id_user, ...req.body });
+    const post = await postService.createPost({ ...req.body });
     if (!post) {
       return res.status(400).json(badRequest(400, "Thêm dữ liệu thất bại!"));
     }

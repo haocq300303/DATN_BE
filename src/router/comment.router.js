@@ -1,24 +1,37 @@
-import express from "express";
-import { commentController } from "../controllers";
+import express from 'express';
+import { commentController } from '../controllers';
+import { authMiddleware } from '../middlewares';
 
 const routerComment = express.Router();
 
 // Get All Comment
-routerComment.get("/", commentController.getAllComment);
+routerComment.get('/', commentController.getAllComment);
 
 // Get One Comment
-routerComment.get("/:idComment", commentController.getComment);
+routerComment.get('/:idComment', commentController.getComment);
 
 // Get Comment By Post
-routerComment.get("/post/:idPost", commentController.getCommentByPost);
+routerComment.get('/post/:idPost', commentController.getCommentByPost);
 
 // Create Comment
-routerComment.post("/", commentController.createComment);
+routerComment.post(
+  '/',
+  authMiddleware.verifyToken,
+  commentController.createComment
+);
 
 // Update Comment
-routerComment.put("/:idComment", commentController.updateComment);
+routerComment.put(
+  '/:idComment',
+  authMiddleware.verifyToken,
+  commentController.updateComment
+);
 
 // Delete Comment
-routerComment.delete("/:idComment", commentController.deleteComment);
+routerComment.delete(
+  '/:idComment',
+  authMiddleware.verifyToken,
+  commentController.deleteComment
+);
 
 export default routerComment;
