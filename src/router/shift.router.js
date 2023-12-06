@@ -65,8 +65,6 @@ routerShift.put(
 );
 routerShift.put(
   '/find-opponent-change/:id',
-  authMiddleware.verifyToken,
-  authMiddleware.verifyAdminPitch,
   shiftController.changeFindOpponent
 );
 
