@@ -1,12 +1,11 @@
 import Pitch from "../models/pitch.model";
 
 export const getAllPitch = async (options) => {
-  console.log(options);
   return Pitch.paginate(
     {},
     {
       ...options,
-      populate: ["admin_pitch_id", "shifts", "services", "location_id", "feedback_id"],
+      populate: ["admin_pitch_id", "services", "feedback_id"],
     }
   );
 };

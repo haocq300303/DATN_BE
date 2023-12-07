@@ -12,6 +12,10 @@ const childrenPitchSchema = new mongoose.Schema(
       min: 1,
       required: true,
     },
+    image: {
+      type: String,
+      required: true,
+    },
   },
 
   { timestamps: true, versionKey: false }
