@@ -1,12 +1,11 @@
 import Pitch from "../models/pitch.model";
 
 export const getAllPitch = async (options) => {
-  console.log(options);
   return Pitch.paginate(
     {},
     {
       ...options,
-      populate: ["admin_pitch_id", "shifts", "services", "location_id", "feedback_id"],
+      populate: ["admin_pitch_id", "services", "feedback_id"],
     }
   );
 };
@@ -34,6 +33,9 @@ export const getOnePitch = async (pitchId) => {
   } catch (error) {
     throw new Error(`Lỗi khi lấy thông tin sân bóng: ${error.message}`);
   }
+};
+export const getFeedbackPitch = (idPitch) => {
+  return Pitch.findById(idPitch).populate([]);
 };
 export const creatPitch = async (pitch) => {
   const product = new Pitch(pitch);

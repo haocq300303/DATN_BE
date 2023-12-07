@@ -1,10 +1,9 @@
-import { endOfDay, format, parseISO, startOfToday } from "date-fns";
+import { format, parse, subDays } from "date-fns";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
 import { childrenPitchService, pitchService, shiftService } from "../services";
 import { chilrenPitchValdation } from "../validations";
-import { utcToZonedTime } from "date-fns-tz";
 
 export const getAll = async (req, res) => {
   try {
@@ -100,18 +99,13 @@ export const getChildrenPitchsByParent = async (req, res) => {
     const { id: idParentPitch } = req.params;
     const { date } = req.query;
 
-    const vietnamTimeZone = "Asia/Ho_Chi_Minh";
-    const newDate = date ? parseISO(date) : startOfToday(new Date());
+    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
 
-    const formattedStartDate = format(
-      utcToZonedTime(newDate, vietnamTimeZone),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-    );
+    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+    // Lấy ngày 30 ngày trước
+    const pastDate = subDays(dateObject, 30);
 
-    const formattedEndDate = format(
-      utcToZonedTime(endOfDay(newDate), vietnamTimeZone),
-      "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-    );
+    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
 
     const childrenPitchs = await childrenPitchService.getChildrenPitchsByParent(
       idParentPitch
@@ -132,32 +126,67 @@ export const getChildrenPitchsByParent = async (req, res) => {
 
     const newChildrenPitchs = [];
 
-    for (const item of childrenPitchs) {
+    for (const childrenPitch of childrenPitchs) {
       try {
         const shifts = await shiftService.getListByOptions({
           field: "$and",
           payload: [
-            { date: { $gte: formattedStartDate, $lt: formattedEndDate } },
-            { id_chirlden_pitch: item._id },
+            { id_chirlden_pitch: childrenPitch._id },
+            {
+              $or: [
+                { date: { $in: [newDate] } },
+                {
+                  is_booking_month: true,
+                  date: {
+                    $elemMatch: {
+                      $gte: formattedPastDate,
+                      $lte: newDate,
+                    },
+                  },
+                },
+              ],
+            },
           ],
         });
 
         const results = shiftsDefault.map((item) => ({
           ...item._doc,
-          id_chirlden_pitch: item.id_chirlden_pitch,
-          date: format(newDate, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-          status_shift: !!shifts.find(
-            (shift) => shift.number_shift === item.number_shift
-          ),
+          id_chirlden_pitch: childrenPitch._id,
+          date: (
+            shifts.find(
+              (shift) =>
+                shift.number_shift === item.number_shift ||
+                shift.number_shift === null
+            ) || item
+          ).date,
+          status_shift:
+            !!shifts.find(
+              (shift) =>
+                shift.number_shift === item.number_shift ||
+                shift.number_shift === null
+            ) || false,
           default: !shifts.find(
-            (shift) => shift.number_shift === item.number_shift
+            (shift) =>
+              shift.number_shift === item.number_shift ||
+              shift.number_shift === null
           ),
           _id: (
-            shifts.find((shift) => shift.number_shift === item.number_shift) ||
-            item
+            shifts.find(
+              (shift) =>
+                shift.number_shift === item.number_shift ||
+                shift.number_shift === null
+            ) || item
           )._id,
+          is_booking_month: (
+            shifts.find(
+              (shift) =>
+                shift.number_shift === item.number_shift ||
+                shift.number_shift === null
+            ) || item
+          ).is_booking_month,
         }));
-        newChildrenPitchs.push({ ...item._doc, shifts: results });
+
+        newChildrenPitchs.push({ ...childrenPitch._doc, shifts: results });
       } catch (error) {
         return res.status(500).json(serverError(error.message));
       }
