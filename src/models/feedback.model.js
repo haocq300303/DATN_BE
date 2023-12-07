@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import moment from "moment";
 
 const feedbackSchema = new Schema(
   {
@@ -9,6 +10,13 @@ const feedbackSchema = new Schema(
   },
   { versionKey: false, timestamps: true }
 );
+feedbackSchema.virtual('createdAtVietnam').get(function () {
+  return moment(this.createdAt).utcOffset(7);
+});
+
+feedbackSchema.virtual('updatedAtVietnam').get(function () {
+  return moment(this.updatedAt).utcOffset(7);
+});
 
 feedbackSchema.plugin(mongoosePaginate);
 
