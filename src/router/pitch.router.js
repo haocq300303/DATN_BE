@@ -8,6 +8,8 @@ const routerPitch = express.Router();
 routerPitch.get('/', pitchController.getAll);
 // GET ById
 routerPitch.get('/:id', pitchController.getById);
+// GET ById and feedback
+routerPitch.get('/feedback/:id', pitchController.getFeedbackPitch);
 // CREATE
 routerPitch.post(
     '/',

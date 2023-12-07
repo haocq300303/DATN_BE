@@ -9,6 +9,8 @@ routerPost.get('/', postController.getAllPost);
 
 // Get One Post
 routerPost.get('/:idPost', postController.getPost);
+// Get One Post and comment
+routerPost.get('/comment/:idPost', postController.getCommentPost);
 
 // Get Post By User
 routerPost.get('/user', postController.getPostByUser);

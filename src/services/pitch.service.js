@@ -35,6 +35,9 @@ export const getOnePitch = async (pitchId) => {
     throw new Error(`Lỗi khi lấy thông tin sân bóng: ${error.message}`);
   }
 };
+export const getFeedbackPitch = (idPitch) => {
+  return Pitch.findById(idPitch).populate([]);
+};
 export const creatPitch = async (pitch) => {
   const product = new Pitch(pitch);
   return await product.save();
