@@ -5,6 +5,7 @@ import Pitch from "../models/pitch.model";
 import { feedbackValidation } from "../validations";
 import { feedbackService } from "../services";
 import Feedback from "../models/feedback.model";
+import moment from "moment";
 
 // Get All Feedback
 export const getAllFeedback = async (req, res) => {
@@ -34,8 +35,16 @@ export const getAllFeedback = async (req, res) => {
     if (!feedbacks || feedbacks.length === 0) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
+    const feedbackWithVietnamTime = {
+      ...feedbacks,
+      data: feedbacks.data.map((feedback) => ({
+        ...feedback.toObject(),
+        createdAt: moment(feedback.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+        updatedAt: moment(feedback.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      })),
+    };
 
-    res.status(200).json(successfully(feedbacks, "Lấy dữ liệu thành công"));
+    res.status(200).json(successfully(feedbackWithVietnamTime, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -43,18 +52,16 @@ export const getAllFeedback = async (req, res) => {
 
 // Create Feedback
 export const createFeedback = async (req, res) => {
+  // console.log("reqUsser:", req.user);
   try {
-    console.log("reqUsser:", req.user);
-    const id_user = req.body.id_user;
+    const id_user = req.user._id;
     const id_pitch = req.body.id_pitch;
     // Kiểm tra xem id_user đã đánh giá id_pitch trước đó chưa
     const existingFeedback = await Feedback.findOne({ id_user, id_pitch });
-    console.log("kiểm tra:", existingFeedback);
     if (existingFeedback) {
       return res.status(400).json(badRequest(400, "Bạn đã đánh giá rồi!"));
     }
 
-    // Tiếp tục tạo đánh giá
     const { error } = feedbackValidation.default.validate(
       { id_user, ...req.body },
       {
@@ -79,7 +86,13 @@ export const createFeedback = async (req, res) => {
       $addToSet: { feedback_id: feedback._id },
     });
 
-    res.status(200).json(successfully(feedback, "Đánh giá thành công"));
+    const feedbackWithVietnamTime = {
+      ...feedback.toObject(),
+      createdAt: moment(feedback.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      updatedAt: moment(feedback.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      user: req.user,
+    };
+    res.status(200).json(successfully(feedbackWithVietnamTime, "Đánh giá thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

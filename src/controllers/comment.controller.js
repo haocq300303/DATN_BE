@@ -5,6 +5,7 @@ import Pitch from "../models/pitch.model";
 import Post from "../models/post.model";
 import { commentValidation } from "../validations";
 import { commentService } from "../services";
+import moment from "moment";
 
 // Get All Comment
 export const getAllComment = async (req, res) => {
@@ -34,8 +35,18 @@ export const getAllComment = async (req, res) => {
     if (!comments || comments.length === 0) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
+    console.log("CommentAll", comments);
+    // Chuyển đổi createdAt và updatedAt thành giờ Việt Nam theo định dạng mong muốn
+    const commentsWithVietnamTime = {
+      ...comments,
+      data: comments.data.map((comment) => ({
+        ...comment.toObject(),
+        createdAt: moment(comment.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+        updatedAt: moment(comment.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      })),
+    };
 
-    res.status(200).json(successfully(comments, "Lấy dữ liệu thành công"));
+    res.status(200).json(successfully(commentsWithVietnamTime, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -75,8 +86,7 @@ export const getCommentByPost = async (req, res) => {
 // Create Comment
 export const createComment = async (req, res) => {
   try {
-    // const { _id: id_user } = req.user;
-    const id_user = "655c53ed6c0689551d7528a3"
+    const { _id: id_user } = req.user;
 
     const { error } = commentValidation.default.validate(
       { id_user, ...req.body },
@@ -109,8 +119,14 @@ export const createComment = async (req, res) => {
         $addToSet: { comment_id: comment._id },
       });
     }
-
-    res.status(200).json(successfully(comment, "Bình luận thành công"));
+    // Chuyển đổi createdAt và updatedAt thành giờ Việt Nam theo định dạng mong muốn
+    const commentWithVietnamTime = {
+      ...comment.toObject(),
+      createdAt: moment(comment.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      updatedAt: moment(comment.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      user: req.user,
+    };
+    res.status(200).json(successfully(commentWithVietnamTime, "Bình luận thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
