@@ -339,7 +339,7 @@ export const getAllShiftByChirldrenPitch = async (req, res) => {
 
     const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
     // Lấy ngày 30 ngày trước
-    const pastDate = subDays(dateObject, 30);
+    const pastDate = subDays(dateObject, 29);
 
     const formattedPastDate = format(pastDate, "yyyy-MM-dd");
 
@@ -559,8 +559,8 @@ export const bookOneShiftFullMonth = async (req, res) => {
     const currentDate = new Date();
 
     // Ngày sau 30 ngày
-    const futureDate = addDays(currentDate, 30);
-    const pastDate = subDays(currentDate, 30);
+    const futureDate = addDays(currentDate, 29);
+    const pastDate = subDays(currentDate, 29);
 
     const formattedCurrentDate = format(currentDate, "yyyy-MM-dd");
     const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
@@ -629,8 +629,8 @@ export const bookChildrenPicthFullMonth = async (req, res) => {
     const currentDate = new Date();
 
     // Ngày sau 30 ngày
-    const futureDate = addDays(currentDate, 30);
-    const pastDate = subDays(currentDate, 30);
+    const futureDate = addDays(currentDate, 29);
+    const pastDate = subDays(currentDate, 29);
 
     const formattedCurrentDate = format(currentDate, "yyyy-MM-dd");
     const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
@@ -677,6 +677,152 @@ export const bookChildrenPicthFullMonth = async (req, res) => {
     }
 
     res.status(200).json(successfully(bookedShifts, "Thêm thành công !!!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+export const getShiftBookedByChildPitchAndNumberShift = async (req, res) => {
+  try {
+    const { id: id_chirlden_pitch } = req.params;
+    const { number_shift } = req.query;
+
+    // Ngày hiện tại
+    const currentDate = new Date();
+
+    // Ngày sau 30 ngày
+    const futureDate = addDays(currentDate, 29);
+    const pastDate = subDays(currentDate, 29);
+
+    const formattedCurrentDate = format(currentDate, "yyyy-MM-dd");
+    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
+    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+
+    const shifts = await shiftService.getListByOptions({
+      field: "$and",
+      payload: [
+        { id_chirlden_pitch },
+        {
+          number_shift: {
+            $in: [number_shift, null],
+          },
+        },
+        {
+          $or: [
+            {
+              date: {
+                $elemMatch: {
+                  $gte: formattedCurrentDate,
+                  $lte: formattedFutureDate,
+                },
+              },
+            },
+            {
+              is_booking_month: true,
+              date: {
+                $elemMatch: {
+                  $gte: formattedPastDate,
+                  $lte: formattedCurrentDate,
+                },
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json(successfully(shifts, "lấy dữ lệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+export const getShiftsByChirldrenPitchBookingMonth = async (req, res) => {
+  try {
+    const { id: id_chirlden_pitch } = req.params;
+    const { date, id_pitch } = req.query;
+
+    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
+
+    const shiftsDefault = await shiftService.getListByOptions({
+      field: "$and",
+      payload: [{ default: true }, { id_pitch }],
+    });
+
+    if (!shiftsDefault || shiftsDefault.length === 0) {
+      return res.status(404).json(badRequest(404, "Không có shifts default!"));
+    }
+
+    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+
+    // Ngày sau 30 ngày
+    const futureDate = addDays(dateObject, 29);
+    // Lấy ngày 30 ngày trước
+    const pastDate = subDays(dateObject, 29);
+
+    const formattedCurrentDate = format(dateObject, "yyyy-MM-dd");
+    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
+    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+
+    const shifts = await shiftService.getListByOptions({
+      field: "$or",
+      payload: [
+        {
+          id_chirlden_pitch,
+          date: {
+            $elemMatch: {
+              $gte: formattedCurrentDate,
+              $lte: formattedFutureDate,
+            },
+          },
+        },
+        {
+          id_chirlden_pitch,
+          date: {
+            $elemMatch: { $gte: formattedPastDate, $lte: formattedCurrentDate },
+          },
+          is_booking_month: true,
+        },
+      ],
+    });
+
+    const results = shiftsDefault.map((item) => ({
+      ...item._doc,
+      id_chirlden_pitch,
+      date: (
+        shifts.find(
+          (shift) =>
+            shift.number_shift === item.number_shift ||
+            shift.number_shift === null
+        ) || item
+      ).date,
+      status_shift:
+        !!shifts.find(
+          (shift) =>
+            shift.number_shift === item.number_shift ||
+            shift.number_shift === null
+        ) || false,
+      default: !shifts.find(
+        (shift) =>
+          shift.number_shift === item.number_shift ||
+          shift.number_shift === null
+      ),
+      _id: (
+        shifts.find(
+          (shift) =>
+            shift.number_shift === item.number_shift ||
+            shift.number_shift === null
+        ) || item
+      )._id,
+      is_booking_month: (
+        shifts.find(
+          (shift) =>
+            shift.number_shift === item.number_shift ||
+            shift.number_shift === null
+        ) || item
+      ).is_booking_month,
+    }));
+
+    res.status(200).json(successfully(results, "lấy dữ lệu thành công!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
