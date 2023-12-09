@@ -5,7 +5,7 @@ export const getAllComment = (options) => {
     {},
     {
       ...options,
-      populate: ["id_user"],
+      populate: ["id_user", "id_post"],
     }
   );
 };

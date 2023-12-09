@@ -16,7 +16,9 @@ export const getByOptions = (options) => {
   };
   return Feedback.findOne(query);
 };
-
+export const getOneFeedback = (idFeedback) => {
+  return Feedback.findById(idFeedback).populate("id_user");
+};
 export const createFeedback = (feedback) => {
   return Feedback.create(feedback);
 };

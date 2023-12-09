@@ -1,7 +1,8 @@
+import moment from "moment";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
-import { pitchService } from "../services";
+import { feedbackService, pitchService } from "../services";
 import { pitchValidation } from "../validations";
 import fs from "fs";
 const locationJson = JSON.parse(fs.readFileSync("locations.json"));
@@ -184,6 +185,41 @@ export const getById = async (req, res) => {
     }
 
     res.status(200).json(successfully(pitch, "Lấy dữ liệu thành công"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+// getFeedbackPitch
+export const getFeedbackPitch = async (req, res) => {
+  try {
+    const pitch = await pitchService.getFeedbackPitch(req.params.id);
+
+    if (!pitch) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+    const feedbackData = await Promise.all(
+      pitch.feedback_id.map(async (feedbackId) => {
+        const feedback = await feedbackService.getOneFeedback(feedbackId);
+        const feedbackWithVietnamTime = {
+          _id: feedback._id,
+          id_user: feedback.id_user,
+          id_pitch: feedback.id_pitch,
+          quantity_star: feedback.quantity_star,
+          createdAt: moment(feedback.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+          updatedAt: moment(feedback.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+        };
+        return feedbackWithVietnamTime;
+      })
+    );
+    // Gửi dữ liệu post và comments về client
+    const formattedPitchFeedback = {
+      feedback_id: feedbackData,
+      createdAt: pitch.createdAt,
+      updatedAt: pitch.updatedAt,
+    };
+
+    res.status(200).json(successfully(formattedPitchFeedback, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
