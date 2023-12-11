@@ -1,0 +1,97 @@
+swagger: "2.0"
+components:
+    schemas:
+        Statistical:
+            type: object
+            properties:
+            example:
+
+tags:
+    - name: Statistical
+      description: Operations related to Statistical data
+
+paths:
+    /api/statistical/revenue:
+        get:
+            tags:
+                - Statistical
+            summary: Lấy doanh thu theo năm
+            description: Thống kê theo năm
+            operationId: getStatisticalRevenue
+            parameters:
+                - in: query
+                  name: year
+                  description: Lấy theo năm
+                  schema:
+                      type: string
+                      default: 2023
+                - in: query
+                  name: pitch_user
+                  description: Id của chủ sân(k phải id sân nhé, nếu không truyền sẽ thống kê doanh thu toàn bộ các sân)
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Statistical"
+            security:
+                - petstore_auth:
+                      - write:statistical
+                      - read:statistical
+/api/statistical/revenue/{month}:
+    get:
+        tags:
+            - Statistical
+        summary: Lấy doanh thu theo tháng
+        description: Thống kê theo tháng
+        operationId: getStatisticalRevenueByMonth
+        parameters:
+            - name: month
+              in: path
+              description: Tháng
+              required: true
+              schema:
+                  type: integer
+                  format: int64
+            - in: query
+              name: year
+              description: Lấy theo năm
+              schema:
+                  type: string
+                  default: "2023"
+            - in: query
+              name: pitch_user
+              description: Id của chủ sân (không phải id sân, nếu không truyền sẽ thống kê doanh thu toàn bộ các sân)
+              schema:
+                  type: string
+                  default: "655c53ed6c0689551d7528a3"
+            - in: query
+              name: start_time
+              description: Ngày bắt đầu
+              schema:
+                  type: string
+                  default: "1"
+            - in: query
+              name: end_time
+              description: Ngày kết thúc
+              schema:
+                  type: string
+                  default: "31"
+        responses:
+            "200":
+                description: Successful response
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: "#/components/schemas/Statistical"
+        security:
+            - petstore_auth:
+                  - write: statistical
+                  - read: statistical
