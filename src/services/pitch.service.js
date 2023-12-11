@@ -1,15 +1,17 @@
 import Pitch from "../models/pitch.model";
 
 export const getAllPitch = async (options) => {
-  console.log(options);
   return Pitch.paginate(
     {},
     {
       ...options,
-      populate: ["admin_pitch_id", "shifts", "services", "location_id", "feedback_id"],
+      populate: ["admin_pitch_id", "services", "feedback_id"],
     }
   );
 };
+export const getServiceAdminPitch = async (idPitch) => {
+    return Pitch.findById(idPitch).populate("services");  
+}
 export const filterFeedbackPitch = async (options) => {
   console.log(options);
   return Pitch.paginate(
@@ -20,6 +22,7 @@ export const filterFeedbackPitch = async (options) => {
     }
   );
 };
+
 export const getOnePitch = async (pitchId) => {
   try {
     const pitch = await Pitch.findById(pitchId).populate([

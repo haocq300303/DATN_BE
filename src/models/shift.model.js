@@ -14,34 +14,38 @@ const shiftSchema = new mongoose.Schema(
     number_shift: {
       type: Number,
       min: 1,
-      require: true,
+      // require: true,
     },
     start_time: {
       type: String,
-      required: true,
+      // required: true,
     },
     end_time: {
       type: String,
-      required: true,
+      // required: true,
     },
     price: {
       type: Number,
       required: true,
     },
     status_shift: {
-      type: String,
-      enum: ["Booked", "UnBooked"],
-      default: "UnBooked",
+      type: Boolean,
     },
-    date: {
-      type: Date,
-    },
+    date: [
+      {
+        type: String,
+      },
+    ],
     find_opponent: {
       type: String,
       enum: ["Find", "NotFind"],
       default: "NotFind",
     },
     default: {
+      type: Boolean,
+      default: false,
+    },
+    is_booking_month: {
       type: Boolean,
       default: false,
     },

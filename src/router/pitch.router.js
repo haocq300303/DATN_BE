@@ -18,6 +18,10 @@ routerPitch.get(
     pitchController.getPichByUser,
 );
 // CREATE
+
+// GET ById and service
+routerPitch.get("/service/:id", pitchController.getService);
+
 routerPitch.post(
     '/',
     authMiddleware.verifyToken,
