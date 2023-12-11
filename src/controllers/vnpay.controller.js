@@ -127,9 +127,8 @@ class PayMentController {
                                     );
                                 }
 
-                                // res.status(200).json({ RspCode: "00", Message: "Thanh toán thành công" });
                             } else {
-                                res.status(200).json({ RspCode: "00", Message: "Success" });
+                                res.redirect(process.env.NODE_URL_CLIENT + "/checkout");
                             }
                         } else {
                             res.status(200).json({ RspCode: "02", Message: "This order has been updated to the payment status" });
