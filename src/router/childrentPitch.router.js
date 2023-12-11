@@ -1,17 +1,17 @@
-import express from 'express';
-import { childrentPitchController } from '../controllers';
-import { authMiddleware } from '../middlewares';
+import express from "express";
+import { childrentPitchController } from "../controllers";
+import { authMiddleware } from "../middlewares";
 const routerChildrentPitch = express.Router();
 
 // Get All
-routerChildrentPitch.get('/', childrentPitchController.getAll);
+routerChildrentPitch.get("/", childrentPitchController.getAll);
 
 // Get One
-routerChildrentPitch.get('/:id', childrentPitchController.getByID);
+routerChildrentPitch.get("/:id", childrentPitchController.getByID);
 
 // Create
 routerChildrentPitch.post(
-  '/',
+  "/",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   childrentPitchController.create
@@ -19,7 +19,7 @@ routerChildrentPitch.post(
 
 // Update
 routerChildrentPitch.put(
-  '/:id',
+  "/:id",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   childrentPitchController.update
@@ -27,7 +27,7 @@ routerChildrentPitch.put(
 
 // Delete
 routerChildrentPitch.delete(
-  '/:id',
+  "/:id",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   childrentPitchController.remove
@@ -35,8 +35,14 @@ routerChildrentPitch.delete(
 
 // Get ChildrenPitchs By Parent
 routerChildrentPitch.get(
-  '/parent/:id',
+  "/parent/:id",
   childrentPitchController.getChildrenPitchsByParent
+);
+
+// Get ChildrenPitchs By Parent Booking Month
+routerChildrentPitch.get(
+  "/parent/booking-month/:id",
+  childrentPitchController.getChildrenPitchsByParentBookingMonth
 );
 
 export default routerChildrentPitch;
