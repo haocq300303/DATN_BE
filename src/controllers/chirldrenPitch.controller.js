@@ -1,4 +1,4 @@
-import { format, parse, subDays } from "date-fns";
+import { addDays, format, parse, subDays } from "date-fns";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
@@ -103,8 +103,7 @@ export const getChildrenPitchsByParent = async (req, res) => {
 
     const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
     // Lấy ngày 30 ngày trước
-    const pastDate = subDays(dateObject, 30);
-
+    const pastDate = subDays(dateObject, 29);
     const formattedPastDate = format(pastDate, "yyyy-MM-dd");
 
     const childrenPitchs = await childrenPitchService.getChildrenPitchsByParent(
@@ -189,6 +188,72 @@ export const getChildrenPitchsByParent = async (req, res) => {
         newChildrenPitchs.push({ ...childrenPitch._doc, shifts: results });
       } catch (error) {
         return res.status(500).json(serverError(error.message));
+      }
+    }
+
+    res
+      .status(200)
+      .json(successfully(newChildrenPitchs, "lấy dữ lệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+export const getChildrenPitchsByParentBookingMonth = async (req, res) => {
+  try {
+    const { id: idParentPitch } = req.params;
+    const { date } = req.query;
+
+    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
+
+    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+    // Ngày sau 30 ngày
+    const futureDate = addDays(dateObject, 29);
+    // Lấy ngày 30 ngày trước
+    const pastDate = subDays(dateObject, 29);
+    const formattedCurrentDate = format(dateObject, "yyyy-MM-dd");
+    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
+    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+
+    const childrenPitchs = await childrenPitchService.getChildrenPitchsByParent(
+      idParentPitch
+    );
+
+    if (!childrenPitchs || childrenPitchs.length === 0) {
+      return res.status(400).json(badRequest(400, "Không dữ liệu!"));
+    }
+
+    const newChildrenPitchs = [];
+
+    for (const childrenPitch of childrenPitchs) {
+      const bookedShifts = await shiftService.getListByOptions({
+        field: "$or",
+        payload: [
+          {
+            id_chirlden_pitch: childrenPitch._id,
+            date: {
+              $elemMatch: {
+                $gte: formattedCurrentDate,
+                $lte: formattedFutureDate,
+              },
+            },
+          },
+          {
+            id_chirlden_pitch: childrenPitch._id,
+            date: {
+              $elemMatch: {
+                $gte: formattedPastDate,
+                $lte: formattedCurrentDate,
+              },
+            },
+            is_booking_month: true,
+          },
+        ],
+      });
+
+      if (bookedShifts && bookedShifts.length > 0) {
+        newChildrenPitchs.push({ ...childrenPitch._doc, isBooking: true });
+      } else {
+        newChildrenPitchs.push({ ...childrenPitch._doc, isBooking: false });
       }
     }
 
