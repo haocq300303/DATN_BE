@@ -12,7 +12,7 @@ export const getAllComment = async (req, res) => {
   try {
     const {
       page = 1,
-      limit = 10,
+      limit = 7,
       _sort = "createdAt",
       _order = "asc",
       ...params
