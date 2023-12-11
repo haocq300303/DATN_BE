@@ -161,10 +161,9 @@ export const createPost = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const { idPost } = req.params;
-    const { _id: id_user } = req.user;
 
     const { error } = postValidation.default.validate(
-      { id_user, ...req.body },
+      { ...req.body },
       {
         abortEarly: false,
       }
@@ -175,7 +174,7 @@ export const updatePost = async (req, res) => {
       return res.status(400).json(badRequest(400, errors));
     }
 
-    const post = await postService.updatePost({ idPost, id_user, ...req.body });
+    const post = await postService.updatePost({ idPost, ...req.body });
 
     if (!post) {
       return res.status(400).json(badRequest(400, "Sửa dữ liệu thất bại!"));
