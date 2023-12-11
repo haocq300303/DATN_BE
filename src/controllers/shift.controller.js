@@ -13,7 +13,6 @@ export const getAll = async (req, res) => {
     if (!shifts || shifts.length === 0) {
       return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
     }
-
     res.status(200).json(successfully(shifts, "lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -187,6 +186,28 @@ export const getAllShiftFindOpponentByPitch = async (req, res) => {
     res.status(500).json(serverError(error.message));
   }
 };
+export const changeFindOpponent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { find_opponent } = req.body;
+
+    const shift = await shiftService.update(id, { find_opponent });
+
+    if (!shift) {
+      return res.status(400).json(badRequest(400, 'Cập nhật thất bại!'));
+    }
+
+    const newShift = {
+      ...shift._doc,
+      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
+    };
+
+    res.status(200).json(successfully(newShift, 'Thay đổi dữ liệu thành công !!!'));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
 
 export const matchOpponent = async (req, res) => {
   try {

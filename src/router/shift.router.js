@@ -53,13 +53,21 @@ routerShift.delete(
   shiftController.deleteShiftDefault
 );
 
-// Find Opponent
+// // Find Opponent
+
+// routerShift.put("/find-opponent-change/:id", shiftController.changeFindOpponent);
+
 routerShift.put(
   "/find-opponent/:id",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   shiftController.find_opponent
 );
+routerShift.put(
+  '/find-opponent-change/:id',
+  shiftController.changeFindOpponent
+);
+
 
 // Match Opponent
 routerShift.post(

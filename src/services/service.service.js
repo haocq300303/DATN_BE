@@ -1,11 +1,11 @@
 import ServiceModel from "../models/service.model";
 
 export const getAll = async () => {
-    return ServiceModel.find().populate('id_Pitch');
+    return ServiceModel.find();
 }
 
-export const getById = async (serviceId) => {
-  return ServiceModel.findById(serviceId);
+export const getOneService = async (serviceId) => {
+  return ServiceModel.findById(serviceId).populate("admin_pitch_id");
 };
 
 export const create = async (data) => {
