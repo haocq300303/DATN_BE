@@ -11,6 +11,10 @@ routerPitch.get('/:id', pitchController.getById);
 // GET ById and feedback
 routerPitch.get('/feedback/:id', pitchController.getFeedbackPitch);
 // CREATE
+
+// GET ById and service
+routerPitch.get("/service/:id", pitchController.getService);
+
 routerPitch.post(
     '/',
     authMiddleware.verifyToken,

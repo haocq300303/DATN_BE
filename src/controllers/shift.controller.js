@@ -13,7 +13,6 @@ export const getAll = async (req, res) => {
     if (!shifts || shifts.length === 0) {
       return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
     }
-
     res.status(200).json(successfully(shifts, "lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));

@@ -4,8 +4,8 @@ export const getAll = async () => {
     return ServiceModel.find();
 }
 
-export const getById = async (serviceId) => {
-  return ServiceModel.findById(serviceId);
+export const getOneService = async (serviceId) => {
+  return ServiceModel.findById(serviceId).populate("admin_pitch_id");
 };
 
 export const create = async (data) => {

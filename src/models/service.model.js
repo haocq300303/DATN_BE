@@ -10,6 +10,11 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
+    admin_pitch_id: {
+      type: mongoose.ObjectId,
+      ref: "User",
+      required: true,
+    },
     image: {
       type: String,
       required: true,

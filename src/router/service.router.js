@@ -1,15 +1,17 @@
-import express from 'express';
-import { serviceController } from '../controllers';
-import { authMiddleware } from '../middlewares';
+import express from "express";
+import { serviceController } from "../controllers";
+import { authMiddleware } from "../middlewares";
 
 const routerService = express.Router();
 
 // GET ALL
-routerService.get('/', serviceController.getAll);
+routerService.get("/", serviceController.getAll);
+
+
 
 // CREATE
 routerService.post(
-  '/',
+  "/",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   serviceController.create
@@ -17,7 +19,7 @@ routerService.post(
 
 // UPDATE
 routerService.patch(
-  '/:id',
+  "/:id",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   serviceController.update
@@ -25,7 +27,7 @@ routerService.patch(
 
 // REMOVE
 routerService.delete(
-  '/:id',
+  "/:id",
   authMiddleware.verifyToken,
   authMiddleware.verifyAdminPitch,
   serviceController.remove

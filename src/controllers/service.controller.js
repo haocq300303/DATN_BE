@@ -12,7 +12,6 @@ export const getAll = async (req, res) => {
         res.status(500).json(serverError(error.message));
     }
 }
-
 export const create = async (req, res) => {
     try {
         const { error } = serviceValidation.default.validate(req.body);

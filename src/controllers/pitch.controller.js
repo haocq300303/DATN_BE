@@ -2,7 +2,7 @@ import moment from "moment";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
-import { feedbackService, pitchService } from "../services";
+import { feedbackService, pitchService, serviceService } from "../services";
 import { pitchValidation } from "../validations";
 import fs from "fs";
 const locationJson = JSON.parse(fs.readFileSync("locations.json"));
@@ -190,6 +190,34 @@ export const getById = async (req, res) => {
   }
 };
 
+// get service pitch
+export const getService = async (req, res) => {
+  try {
+       const pitch = await pitchService.getServiceAdminPitch(req.params.id);
+       if (!pitch) {
+         return res.status(404).json({ error: 'Lấy dữ liệu không thành công' });
+       }
+       const serviceData = await Promise.all(
+        pitch.services.map(async (serviceId) => {
+          const service = await serviceService.getOneService(serviceId);
+          const serviceWithVietnamTime = {
+            _id: service._id,
+            name: service.name,
+            price: service.price,
+            admin_pitch_id: service.admin_pitch_id,
+            image: service.image,
+            createdAt: moment(service.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+            updatedAt: moment(service.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+          };
+          return serviceWithVietnamTime;
+        })
+      );
+         res.status(200).json(successfully(serviceData, "Lấy dữ liệu thành công"));
+     } catch (error) {
+         res.status(500).json(serverError(error.message));
+     }
+ }
+
 // getFeedbackPitch
 export const getFeedbackPitch = async (req, res) => {
   try {
@@ -224,6 +252,8 @@ export const getFeedbackPitch = async (req, res) => {
     res.status(500).json(serverError(error.message));
   }
 };
+
+
 
 export const create = async (req, res) => {
   try {
