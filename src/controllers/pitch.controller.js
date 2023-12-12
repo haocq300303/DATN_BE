@@ -126,11 +126,16 @@ export const filterFeedBack = async (req, res) => {
     const { data: dataPitch, ...pagi } = pitchs;
     const pitchesWithStars = pitchs.data.map((pitch) => {
       // Tính tổng quantity_star
-      const totalStars = pitch.feedback_id.reduce((sum, feedback) => sum + feedback.quantity_star, 0);
+      const totalStars = pitch.feedback_id.reduce(
+        (sum, feedback) => sum + feedback.quantity_star,
+        0
+      );
 
       // Tính trung bình cộng quantity_star
-      const averageStars = pitch.feedback_id.length > 0 ? totalStars / pitch.feedback_id.length : 0;
-
+      const averageStars =
+        pitch.feedback_id.length > 0
+          ? totalStars / pitch.feedback_id.length
+          : 0;
 
       if (minStart || maxStart) {
         const isStarsMatched =
@@ -167,13 +172,18 @@ export const filterFeedBack = async (req, res) => {
     // Lọc các pitch không thỏa mãn điều kiện
     const filteredPitches = pitchesWithStars.filter((pitch) => pitch !== null);
 
-    res.status(200).json(successfully({ data: filteredPitches, ...pagi }, "Lấy dữ liệu thành công"));
+    res
+      .status(200)
+      .json(
+        successfully(
+          { data: filteredPitches, ...pagi },
+          "Lấy dữ liệu thành công"
+        )
+      );
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
-
-
 
 //get one Pitch
 export const getById = async (req, res) => {
@@ -183,8 +193,18 @@ export const getById = async (req, res) => {
     if (!pitch) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
-
-    res.status(200).json(successfully(pitch, "Lấy dữ liệu thành công"));
+    const pitchOneWithVietnamTime = {
+      ...pitch.toObject(),
+      createdAt: moment(pitch.createdAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+      updatedAt: moment(pitch.updatedAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+    };
+    res
+      .status(200)
+      .json(successfully(pitchOneWithVietnamTime, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -200,19 +220,29 @@ export const getPichByUser = async (req, res) => {
     }
 
     const updatedPitches = pitches.map((pitch) => {
-      const location = locationJson.wards.find((ward) => ward.id === pitch.location_id);
-      const district = locationJson.districts.find((district) => district.id === pitch.districts_id);
+      const location = locationJson.wards.find(
+        (ward) => ward.id === pitch.location_id
+      );
+      const district = locationJson.districts.find(
+        (district) => district.id === pitch.districts_id
+      );
 
       return {
         ...pitch.toObject(),
         location_id: location ? location.name : pitch.location_id,
         districts_id: district ? district.name : pitch.districts_id,
-        createdAt: moment(pitch.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-        updatedAt: moment(pitch.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+        createdAt: moment(pitch.createdAt)
+          .utcOffset(7)
+          .format("DD/MM/YYYY - HH:mm"),
+        updatedAt: moment(pitch.updatedAt)
+          .utcOffset(7)
+          .format("DD/MM/YYYY - HH:mm"),
       };
     });
 
-    res.status(200).json(successfully(updatedPitches[0], "Lấy dữ liệu thành công"));
+    res
+      .status(200)
+      .json(successfully(updatedPitches[0], "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -221,30 +251,34 @@ export const getPichByUser = async (req, res) => {
 // get service pitch
 export const getService = async (req, res) => {
   try {
-       const pitch = await pitchService.getServiceAdminPitch(req.params.id);
-       if (!pitch) {
-         return res.status(404).json({ error: 'Lấy dữ liệu không thành công' });
-       }
-       const serviceData = await Promise.all(
-        pitch.services.map(async (serviceId) => {
-          const service = await serviceService.getOneService(serviceId);
-          const serviceWithVietnamTime = {
-            _id: service._id,
-            name: service.name,
-            price: service.price,
-            admin_pitch_id: service.admin_pitch_id,
-            image: service.image,
-            createdAt: moment(service.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-            updatedAt: moment(service.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-          };
-          return serviceWithVietnamTime;
-        })
-      );
-         res.status(200).json(successfully(serviceData, "Lấy dữ liệu thành công"));
-     } catch (error) {
-         res.status(500).json(serverError(error.message));
-     }
- }
+    const pitch = await pitchService.getServiceAdminPitch(req.params.id);
+    if (!pitch) {
+      return res.status(404).json({ error: "Lấy dữ liệu không thành công" });
+    }
+    const serviceData = await Promise.all(
+      pitch.services.map(async (serviceId) => {
+        const service = await serviceService.getOneService(serviceId);
+        const serviceWithVietnamTime = {
+          _id: service._id,
+          name: service.name,
+          price: service.price,
+          admin_pitch_id: service.admin_pitch_id,
+          image: service.image,
+          createdAt: moment(service.createdAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
+          updatedAt: moment(service.updatedAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
+        };
+        return serviceWithVietnamTime;
+      })
+    );
+    res.status(200).json(successfully(serviceData, "Lấy dữ liệu thành công"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
 
 // getFeedbackPitch
 export const getFeedbackPitch = async (req, res) => {
@@ -262,8 +296,12 @@ export const getFeedbackPitch = async (req, res) => {
           id_user: feedback.id_user,
           id_pitch: feedback.id_pitch,
           quantity_star: feedback.quantity_star,
-          createdAt: moment(feedback.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-          updatedAt: moment(feedback.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+          createdAt: moment(feedback.createdAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
+          updatedAt: moment(feedback.updatedAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
         };
         return feedbackWithVietnamTime;
       })
@@ -275,13 +313,13 @@ export const getFeedbackPitch = async (req, res) => {
       updatedAt: pitch.updatedAt,
     };
 
-    res.status(200).json(successfully(formattedPitchFeedback, "Lấy dữ liệu thành công"));
+    res
+      .status(200)
+      .json(successfully(formattedPitchFeedback, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
-
-
 
 export const create = async (req, res) => {
   try {
@@ -319,10 +357,16 @@ export const update = async (req, res) => {
     }
     const pitchUpdateVietnam = {
       ...pitch.toObject(),
-      createdAt: moment(pitch.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-      updatedAt: moment(pitch.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-    }
-    res.status(200).json(successfully(pitchUpdateVietnam, "Sửa thành công !!!"));
+      createdAt: moment(pitch.createdAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+      updatedAt: moment(pitch.updatedAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+    };
+    res
+      .status(200)
+      .json(successfully(pitchUpdateVietnam, "Sửa thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

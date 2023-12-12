@@ -137,4 +137,8 @@ routerShift.get(
   "/childrent-pitch/booking-month/:id",
   shiftController.getShiftsByChirldrenPitchBookingMonth
 );
+
+// Get Shifts By Pitch
+routerShift.get("/pitch/:id", shiftController.getShiftsByPitch);
+
 export default routerShift;

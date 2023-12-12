@@ -10,7 +10,7 @@ export const getAllPitch = async (options) => {
   );
 };
 export const getServiceAdminPitch = async (idPitch) => {
-    return Pitch.findById(idPitch).populate("services");  
+  return Pitch.findById(idPitch).populate("services");
 }
 export const filterFeedbackPitch = async (options) => {
   console.log(options);
@@ -42,7 +42,7 @@ export const getFeedbackPitch = (idPitch) => {
   return Pitch.findById(idPitch).populate([]);
 };
 export const getPitchByUser = (id_user) => {
-  return Pitch.find({ admin_pitch_id: id_user }).populate(["shifts", "admin_pitch_id", "services"]);
+  return Pitch.find({ admin_pitch_id: id_user }).populate(["admin_pitch_id", "services"]);
 };
 export const creatPitch = async (pitch) => {
   const product = new Pitch(pitch);
