@@ -59,7 +59,12 @@ export const getPost = async (req, res) => {
     if (!post) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
-    res.status(200).json(successfully(post, "Lấy dữ liệu thành công"));
+    const postOneWithVietnamTime = {
+      ...post.toObject(),
+      createdAt: moment(post.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+      updatedAt: moment(post.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+    }
+    res.status(200).json(successfully(postOneWithVietnamTime, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -98,7 +103,7 @@ export const getCommentPost = async (req, res) => {
       title: post.title,
       description: post.description,
       images: post.images,
-      feedback_id: commentData,
+      comment_id: commentData,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };
@@ -156,10 +161,9 @@ export const createPost = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const { idPost } = req.params;
-    const { _id: id_user } = req.user;
 
     const { error } = postValidation.default.validate(
-      { id_user, ...req.body },
+      { ...req.body },
       {
         abortEarly: false,
       }
@@ -170,7 +174,7 @@ export const updatePost = async (req, res) => {
       return res.status(400).json(badRequest(400, errors));
     }
 
-    const post = await postService.updatePost({ idPost, id_user, ...req.body });
+    const post = await postService.updatePost({ idPost, ...req.body });
 
     if (!post) {
       return res.status(400).json(badRequest(400, "Sửa dữ liệu thất bại!"));

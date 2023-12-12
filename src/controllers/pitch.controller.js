@@ -2,7 +2,7 @@ import moment from "moment";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
-import { feedbackService, pitchService } from "../services";
+import { feedbackService, pitchService, serviceService } from "../services";
 import { pitchValidation } from "../validations";
 import fs from "fs";
 const locationJson = JSON.parse(fs.readFileSync("locations.json"));
@@ -185,6 +185,7 @@ export const filterFeedBack = async (req, res) => {
   }
 };
 
+//get one Pitch
 export const getById = async (req, res) => {
   try {
     const pitch = await pitchService.getOnePitch(req.params.id);
@@ -192,8 +193,88 @@ export const getById = async (req, res) => {
     if (!pitch) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
+    const pitchOneWithVietnamTime = {
+      ...pitch.toObject(),
+      createdAt: moment(pitch.createdAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+      updatedAt: moment(pitch.updatedAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+    };
+    res
+      .status(200)
+      .json(successfully(pitchOneWithVietnamTime, "Lấy dữ liệu thành công"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+// Get Pitch By User
+export const getPichByUser = async (req, res) => {
+  try {
+    const { _id: userId } = req.user;
+    const pitches = await pitchService.getPitchByUser(userId);
 
-    res.status(200).json(successfully(pitch, "Lấy dữ liệu thành công"));
+    if (!pitches || pitches.length === 0) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    const updatedPitches = pitches.map((pitch) => {
+      const location = locationJson.wards.find(
+        (ward) => ward.id === pitch.location_id
+      );
+      const district = locationJson.districts.find(
+        (district) => district.id === pitch.districts_id
+      );
+
+      return {
+        ...pitch.toObject(),
+        location_id: location ? location.name : pitch.location_id,
+        districts_id: district ? district.name : pitch.districts_id,
+        createdAt: moment(pitch.createdAt)
+          .utcOffset(7)
+          .format("DD/MM/YYYY - HH:mm"),
+        updatedAt: moment(pitch.updatedAt)
+          .utcOffset(7)
+          .format("DD/MM/YYYY - HH:mm"),
+      };
+    });
+
+    res
+      .status(200)
+      .json(successfully(updatedPitches[0], "Lấy dữ liệu thành công"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+// get service pitch
+export const getService = async (req, res) => {
+  try {
+    const pitch = await pitchService.getServiceAdminPitch(req.params.id);
+    if (!pitch) {
+      return res.status(404).json({ error: "Lấy dữ liệu không thành công" });
+    }
+    const serviceData = await Promise.all(
+      pitch.services.map(async (serviceId) => {
+        const service = await serviceService.getOneService(serviceId);
+        const serviceWithVietnamTime = {
+          _id: service._id,
+          name: service.name,
+          price: service.price,
+          admin_pitch_id: service.admin_pitch_id,
+          image: service.image,
+          createdAt: moment(service.createdAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
+          updatedAt: moment(service.updatedAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
+        };
+        return serviceWithVietnamTime;
+      })
+    );
+    res.status(200).json(successfully(serviceData, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -260,18 +341,32 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
+    console.log("User:", req.user);
+    const { _id: userId } = req.user;
     const { error } = pitchValidation.default.validate(req.body);
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
     const pitch = await pitchService.updatePitch({
+      admin_pitch_id: userId,
       ...req.body,
       id: req.params.id,
     });
     if (!pitch) {
       return res.status(400).json(badRequest(400, "Sửa không thành công !!!"));
     }
-    res.status(200).json(successfully(pitch, "Sửa thành công !!!"));
+    const pitchUpdateVietnam = {
+      ...pitch.toObject(),
+      createdAt: moment(pitch.createdAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+      updatedAt: moment(pitch.updatedAt)
+        .utcOffset(7)
+        .format("DD/MM/YYYY - HH:mm"),
+    };
+    res
+      .status(200)
+      .json(successfully(pitchUpdateVietnam, "Sửa thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
