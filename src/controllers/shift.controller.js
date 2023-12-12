@@ -1,11 +1,16 @@
+import { addDays, format, parse, subDays } from "date-fns";
+import "dotenv/config";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
-import { shiftService, userService } from "../services";
-import { shiftValidation } from "../validations";
+import {
+  childrenPitchService,
+  pitchService,
+  shiftService,
+  userService,
+} from "../services";
 import { transporter } from "../utils/sendEmail";
-import "dotenv/config";
-import { addDays, format, parse, subDays } from "date-fns";
+import { shiftValidation } from "../validations";
 
 export const getAll = async (req, res) => {
   try {
@@ -417,13 +422,10 @@ export const changeStatusShift = async (req, res) => {
     if (!shift) {
       return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
     }
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
+
     res
       .status(200)
-      .json(successfully(newShift, "Thay đổi dữ liệu thành công !!!"));
+      .json(successfully(shift, "Thay đổi dữ liệu thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -445,6 +447,20 @@ export const createShiftDefault = async (req, res) => {
       return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
     }
 
+    const shifts = await shiftService.getListByOptions({
+      field: "$and",
+      payload: [{ default: true }, { id_pitch: shift.id_pitch }],
+    });
+
+    const totalPrice = shifts.reduce((sum, shift) => sum + shift.price, 0);
+
+    const averagePrice = totalPrice / shifts.length;
+
+    await pitchService.updatePitch({
+      id: shift.id_pitch,
+      average_price: averagePrice,
+    });
+
     res.status(200).json(successfully(shift, "Thêm thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -464,6 +480,20 @@ export const updateShiftDefault = async (req, res) => {
         .json(badRequest(400, "Cập nhật không thành công !!!"));
     }
 
+    const shifts = await shiftService.getListByOptions({
+      field: "$and",
+      payload: [{ default: true }, { id_pitch: shift.id_pitch }],
+    });
+
+    const totalPrice = shifts.reduce((sum, shift) => sum + shift.price, 0);
+
+    const averagePrice = totalPrice / shifts.length;
+
+    await pitchService.updatePitch({
+      id: shift.id_pitch,
+      average_price: averagePrice,
+    });
+
     res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -476,6 +506,20 @@ export const deleteShiftDefault = async (req, res) => {
     if (!shift) {
       return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
     }
+
+    const shifts = await shiftService.getListByOptions({
+      field: "$and",
+      payload: [{ default: true }, { id_pitch: shift.id_pitch }],
+    });
+
+    const totalPrice = shifts.reduce((sum, shift) => sum + shift.price, 0);
+
+    const averagePrice = totalPrice / shifts.length;
+
+    await pitchService.updatePitch({
+      id: shift.id_pitch,
+      average_price: averagePrice,
+    });
 
     res.status(200).json(successfully(shift, "Xóa thành công !!!"));
   } catch (error) {
@@ -531,7 +575,7 @@ export const bookMultipleDay = async (req, res) => {
       });
     }
 
-    data.price = data.price * data.date.length;
+    // data.price = data.price * data.date.length;
 
     const shift = await shiftService.creat(data);
 
@@ -601,7 +645,7 @@ export const bookOneShiftFullMonth = async (req, res) => {
     }
 
     data.date = [formattedCurrentDate];
-    data.price = data.price * 30;
+    // data.price = data.price * 30;
 
     const shift = await shiftService.creat(data);
 
@@ -676,7 +720,7 @@ export const bookChildrenPicthFullMonth = async (req, res) => {
       return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
     }
 
-    res.status(200).json(successfully(bookedShifts, "Thêm thành công !!!"));
+    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -823,6 +867,124 @@ export const getShiftsByChirldrenPitchBookingMonth = async (req, res) => {
     }));
 
     res.status(200).json(successfully(results, "lấy dữ lệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+export const getShiftsByPitch = async (req, res) => {
+  try {
+    const { id: id_pitch } = req.params;
+    const { date } = req.query;
+
+    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
+
+    const childrenPitchs = await childrenPitchService.getChildrenPitchsByParent(
+      id_pitch
+    );
+
+    if (!childrenPitchs || childrenPitchs.length === 0) {
+      return res.status(400).json(badRequest(400, "Không dữ liệu!"));
+    }
+
+    const shiftsDefault = await shiftService.getListByOptions({
+      field: "$and",
+      payload: [{ default: true }, { id_pitch }],
+    });
+
+    if (!shiftsDefault || shiftsDefault.length === 0) {
+      return res.status(404).json(badRequest(404, "Không có shifts default!"));
+    }
+
+    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+    // Lấy ngày 30 ngày trước
+    const pastDate = subDays(dateObject, 29);
+    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+
+    const newShifts = [];
+
+    for (const childrenPitch of childrenPitchs) {
+      const shifts = await shiftService.getListByOptions({
+        field: "$and",
+        payload: [
+          { id_chirlden_pitch: childrenPitch._id },
+          {
+            $or: [
+              { date: { $in: [newDate] } },
+              {
+                is_booking_month: true,
+                date: {
+                  $elemMatch: {
+                    $gte: formattedPastDate,
+                    $lte: newDate,
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      const results = shiftsDefault.map((item) => ({
+        ...item._doc,
+        id_chirlden_pitch: childrenPitch,
+        id_pitch,
+        date: (
+          shifts.find(
+            (shift) =>
+              shift.number_shift === item.number_shift ||
+              shift.number_shift === null
+          ) || item
+        ).date,
+        start_time: (
+          shifts.find((shift) => shift.number_shift === item.number_shift) ||
+          item
+        ).start_time,
+        end_time: (
+          shifts.find((shift) => shift.number_shift === item.number_shift) ||
+          item
+        ).end_time,
+        price: (
+          shifts.find(
+            (shift) =>
+              shift.number_shift === item.number_shift ||
+              shift.number_shift === null
+          ) || item
+        ).price,
+        status_shift:
+          !!shifts.find(
+            (shift) =>
+              shift.number_shift === item.number_shift ||
+              shift.number_shift === null
+          ) || false,
+        default: !shifts.find(
+          (shift) =>
+            shift.number_shift === item.number_shift ||
+            shift.number_shift === null
+        ),
+        _id: (
+          shifts.find(
+            (shift) =>
+              shift.number_shift === item.number_shift ||
+              shift.number_shift === null
+          ) || item
+        )._id,
+        find_opponent: (
+          shifts.find((shift) => shift.number_shift === item.number_shift) ||
+          item
+        ).find_opponent,
+        is_booking_month: (
+          shifts.find(
+            (shift) =>
+              shift.number_shift === item.number_shift ||
+              shift.number_shift === null
+          ) || item
+        ).is_booking_month,
+      }));
+
+      newShifts.push(...results);
+    }
+
+    res.status(200).json(successfully(newShifts, "lấy dữ lệu thành công!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

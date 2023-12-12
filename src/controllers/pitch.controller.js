@@ -126,11 +126,16 @@ export const filterFeedBack = async (req, res) => {
     const { data: dataPitch, ...pagi } = pitchs;
     const pitchesWithStars = pitchs.data.map((pitch) => {
       // Tính tổng quantity_star
-      const totalStars = pitch.feedback_id.reduce((sum, feedback) => sum + feedback.quantity_star, 0);
+      const totalStars = pitch.feedback_id.reduce(
+        (sum, feedback) => sum + feedback.quantity_star,
+        0
+      );
 
       // Tính trung bình cộng quantity_star
-      const averageStars = pitch.feedback_id.length > 0 ? totalStars / pitch.feedback_id.length : 0;
-
+      const averageStars =
+        pitch.feedback_id.length > 0
+          ? totalStars / pitch.feedback_id.length
+          : 0;
 
       if (minStart || maxStart) {
         const isStarsMatched =
@@ -167,14 +172,18 @@ export const filterFeedBack = async (req, res) => {
     // Lọc các pitch không thỏa mãn điều kiện
     const filteredPitches = pitchesWithStars.filter((pitch) => pitch !== null);
 
-    res.status(200).json(successfully({ data: filteredPitches, ...pagi }, "Lấy dữ liệu thành công"));
+    res
+      .status(200)
+      .json(
+        successfully(
+          { data: filteredPitches, ...pagi },
+          "Lấy dữ liệu thành công"
+        )
+      );
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
-
-
-
 
 export const getById = async (req, res) => {
   try {
@@ -206,8 +215,12 @@ export const getFeedbackPitch = async (req, res) => {
           id_user: feedback.id_user,
           id_pitch: feedback.id_pitch,
           quantity_star: feedback.quantity_star,
-          createdAt: moment(feedback.createdAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
-          updatedAt: moment(feedback.updatedAt).utcOffset(7).format('DD/MM/YYYY - HH:mm'),
+          createdAt: moment(feedback.createdAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
+          updatedAt: moment(feedback.updatedAt)
+            .utcOffset(7)
+            .format("DD/MM/YYYY - HH:mm"),
         };
         return feedbackWithVietnamTime;
       })
@@ -219,7 +232,9 @@ export const getFeedbackPitch = async (req, res) => {
       updatedAt: pitch.updatedAt,
     };
 
-    res.status(200).json(successfully(formattedPitchFeedback, "Lấy dữ liệu thành công"));
+    res
+      .status(200)
+      .json(successfully(formattedPitchFeedback, "Lấy dữ liệu thành công"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

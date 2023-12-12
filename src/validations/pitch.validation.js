@@ -10,7 +10,7 @@ const pitchSchema = Joi.object({
   services: Joi.array(),
   location_id: Joi.string().required(),
   districts_id: Joi.string().required(),
-  deposit_price: Joi.number().required(),
+  average_price: Joi.number(),
   avatar: Joi.string().required(),
   comment_id: Joi.array(),
   feedback_id: Joi.array(),
