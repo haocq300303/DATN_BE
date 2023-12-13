@@ -1,0 +1,60 @@
+swagger: "2.0"
+components:
+    schemas:
+        Booking:
+            type: object
+            properties:
+            example:
+
+/api/bookings:
+    get:
+        tags:
+            - bookings
+        summary: Get list of bookings
+        description: Retrieves a list of bookings
+        operationId: getBookingList
+        responses:
+            "200":
+                description: Successful response
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: "#/components/schemas/Booking"
+        security:
+            - petstore_auth:
+/api/bookings/get-by-field:
+    get:
+        tags:
+            - bookings
+        summary: Get bookings by field
+        description: Retrieves a list of bookings
+        operationId: getBookingByField
+        parameters:
+              - in: query
+                name: _id
+                description: Lấy theo _id booking
+                schema:
+                    type: string
+              - in: query
+                name: payment_id
+                description: Lấy theo payment_id
+                schema:
+                    type: string
+              - in: query
+                name: shift_id
+                description: Lấy theo shift_id
+                schema:
+                    type: string
+        responses:
+            "200":
+                description: Successful response
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: "#/components/schemas/Booking"
+        security:
+            - petstore_auth:
