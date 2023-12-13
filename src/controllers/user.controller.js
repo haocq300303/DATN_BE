@@ -14,7 +14,7 @@ export const getList = async (req, res) => {
     const {
       _sort = 'createdAt',
       page = 1,
-      limit = 10,
+      limit = 50,
       _order = 'desc',
       ...params
     } = req.query;
