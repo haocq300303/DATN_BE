@@ -1,4 +1,5 @@
 import ServiceModel from "../models/service.model";
+import Pitch from "../models/pitch.model";
 
 export const getAll = async () => {
     return ServiceModel.find();
@@ -7,6 +8,18 @@ export const getAll = async () => {
 export const getOneService = async (serviceId) => {
   return ServiceModel.findById(serviceId).populate("admin_pitch_id");
 };
+
+export const addIdPitch = async (service) => {
+  return Pitch.findByIdAndUpdate(service.pitch_id,{
+    $addToSet: { services: service._id}
+  })
+};
+
+export const removeIdPitch = async (service) => {
+  return Pitch.findByIdAndUpdate(service?.pitch_id, {
+    $pull: { services: service?.id },
+  });
+}
 
 export const create = async (data) => {
   return await ServiceModel.create(data);

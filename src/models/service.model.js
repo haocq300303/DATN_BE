@@ -15,6 +15,11 @@ const serviceSchema = new Schema(
       ref: "User",
       required: true,
     },
+    pitch_id: {
+      type: mongoose.ObjectId,
+      ref: "Pitch",
+      required: true,
+    },
     image: {
       type: String,
       required: true,
