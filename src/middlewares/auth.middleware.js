@@ -8,7 +8,7 @@ export const verifyToken = (req, res, next) => {
       if (error) {
         return res.status(401).json({
           error: true,
-          message: 'Token is not valid!',
+          message: 'Token không hợp lệ!',
         });
       }
       req.user = user;
@@ -18,7 +18,7 @@ export const verifyToken = (req, res, next) => {
   } else {
     res.status(403).json({
       error: true,
-      message: "You're not authenticated",
+      message: 'Tài khoản của bạn không được xác thực!',
     });
   }
 };
@@ -30,7 +30,7 @@ export const verifyAdminPitch = (req, res, next) => {
       if (error) {
         return res.status(401).json({
           error: true,
-          message: 'Token is not valid!',
+          message: 'Token không hợp lệ!',
         });
       }
       const role = await roleService.getById(user.role_id);
@@ -39,14 +39,14 @@ export const verifyAdminPitch = (req, res, next) => {
       } else {
         return res.status(402).json({
           error: true,
-          message: 'You do not have permission',
+          message: 'Bạn không có quyền thực hiện tác vụ này!',
         });
       }
     });
   } else {
     res.status(403).json({
       error: true,
-      message: "You're not authenticated",
+      message: 'Tài khoản của bạn không được xác thực!',
     });
   }
 };
@@ -58,7 +58,7 @@ export const verifyAdmin = (req, res, next) => {
       if (error) {
         return res.status(401).json({
           error: true,
-          message: 'Token is not valid!',
+          message: 'Token không hợp lệ!',
         });
       }
       const role = await roleService.getById(user.role_id);
@@ -67,14 +67,14 @@ export const verifyAdmin = (req, res, next) => {
       } else {
         return res.status(402).json({
           error: true,
-          message: 'You do not have permission',
+          message: 'Bạn không có quyền thực hiện tác vụ này!',
         });
       }
     });
   } else {
     res.status(403).json({
       error: true,
-      message: "You're not authenticated",
+      message: 'Tài khoản của bạn không được xác thực!',
     });
   }
 };

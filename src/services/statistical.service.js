@@ -26,6 +26,9 @@ export const getRevenueByYear = async (year, pitchUser) => {
             $group: {
                 _id: { month: { $month: "$createdAt" }, year: "$year" },
                 totalPrice: { $sum: "$total_received" },
+                totalBooking: { $sum: 1 },
+                successCount: { $sum: { $cond: [{ $eq: ["$status", "success"] }, 1, 0] } },
+                cancelCount: { $sum: { $cond: [{ $eq: ["$status", "cancel"] }, 1, 0] } },
             },
         },
         {
@@ -35,6 +38,9 @@ export const getRevenueByYear = async (year, pitchUser) => {
                     $push: {
                         month: "$_id.month",
                         totalPrice: "$totalPrice",
+                        totalBooking: "$totalBooking",
+                        successCount: "$successCount",
+                        cancelCount: "$cancelCount",
                     },
                 },
             },
@@ -64,7 +70,7 @@ export const getRevenueByYear = async (year, pitchUser) => {
                                         0,
                                     ],
                                 },
-                                { month: "$$monthIndex", totalPrice: 0 },
+                                { month: "$$monthIndex", totalPrice: 0, totalBooking: 0 },
                             ],
                         },
                     },
@@ -126,6 +132,9 @@ export const getRevenueByMonth = async ({ month, year, startTime, endTime, pitch
             $group: {
                 _id: { $dayOfMonth: "$createdAt" },
                 totalPrice: { $sum: "$total_received" },
+                totalBooking: { $sum: 1 },
+                successCount: { $sum: { $cond: [{ $eq: ["$status", "success"] }, 1, 0] } },
+                cancelCount: { $sum: { $cond: [{ $eq: ["$status", "cancel"] }, 1, 0] } },
             },
         },
     ];
@@ -135,7 +144,13 @@ export const getRevenueByMonth = async ({ month, year, startTime, endTime, pitch
     const groupedData = datesArray.map((date) => {
         const day = date.getDate();
         const found = result.find((item) => item._id === day);
-        return { day, totalPrice: found ? found.totalPrice : 0 };
+        return {
+            day,
+            totalPrice: found ? found.totalPrice : 0,
+            totalBooking: found ? found.totalBooking : 0,
+            successCount: found ? found.successCount : 0,
+            cancelCount: found ? found.cancelCount : 0,
+        };
     });
 
     return groupedData;
