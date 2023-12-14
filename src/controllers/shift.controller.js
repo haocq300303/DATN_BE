@@ -3,14 +3,10 @@ import "dotenv/config";
 import { badRequest } from "../formatResponse/badRequest";
 import { serverError } from "../formatResponse/serverError";
 import { successfully } from "../formatResponse/successfully";
-import {
-  childrenPitchService,
-  pitchService,
-  shiftService,
-  userService,
-} from "../services";
+import { childrenPitchService, pitchService, shiftService } from "../services";
 import { transporter } from "../utils/sendEmail";
 import { shiftValidation } from "../validations";
+import * as BookingService from "../services/booking.service";
 
 export const getAll = async (req, res) => {
   try {
@@ -127,19 +123,17 @@ export const remove = async (req, res) => {
 export const find_opponent = async (req, res) => {
   try {
     const { id: shift_id } = req.params;
+    const { find_opponent } = req.body;
 
-    const shift = await shiftService.update(shift_id, req.body);
+    const shift = await shiftService.update(shift_id, { find_opponent });
 
     if (!shift) {
       return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
     }
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
+
     res
       .status(200)
-      .json(successfully(newShift, "Thay đổi dữ liệu thành công !!!"));
+      .json(successfully(shift, "Thay đổi dữ liệu thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -147,18 +141,29 @@ export const find_opponent = async (req, res) => {
 
 export const getAllShiftFindOpponent = async (req, res) => {
   try {
-    const data = await shiftService.getListByOptionsPopulate({
-      field: "find_opponent",
-      payload: "Find",
+    const today = format(new Date(), "yyyy-MM-dd");
+
+    const shifts = await shiftService.getListByOptionsPopulate({
+      field: "$and",
+      payload: [
+        { find_opponent: "Find" },
+        { date: { $elemMatch: { $gte: today } } },
+      ],
     });
 
-    if (!data || data.length === 0) {
+    if (!shifts || shifts.length === 0) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
-    const newShifts = data.map((item) => ({
-      ...item._doc,
-      date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    }));
+
+    const newShifts = [];
+
+    for (const shift of shifts) {
+      const bookingDb = await BookingService.getByField({
+        shift_id: shift._id.toString(),
+      });
+
+      newShifts.push({ ...shift._doc, user: bookingDb?.user_booking });
+    }
 
     res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
   } catch (error) {
@@ -170,59 +175,44 @@ export const getAllShiftFindOpponentByPitch = async (req, res) => {
   try {
     const { id: id_pitch } = req.params;
 
-    const data = await shiftService.getListByOptionsPopulate({
-      field: "id_pitch",
-      payload: id_pitch,
+    const today = format(new Date(), "yyyy-MM-dd");
+
+    const shifts = await shiftService.getListByOptionsPopulate({
+      field: "$and",
+      payload: [
+        { id_pitch },
+        { find_opponent: "Find" },
+        { date: { $elemMatch: { $gte: today } } },
+      ],
     });
 
-    if (!data || data.length === 0) {
+    if (!shifts || shifts.length === 0) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
 
-    const newData = data.filter((item) => item.find_opponent === "Find");
+    const newShifts = [];
 
-    const newShifts = newData.map((item) => ({
-      ...item._doc,
-      date: format(item.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    }));
+    for (const shift of shifts) {
+      const bookingDb = await BookingService.getByField({
+        shift_id: shift._id.toString(),
+      });
+
+      newShifts.push({ ...shift._doc, user: bookingDb?.user_booking });
+    }
 
     res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
-export const changeFindOpponent = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { find_opponent } = req.body;
-
-    const shift = await shiftService.update(id, { find_opponent });
-
-    if (!shift) {
-      return res.status(400).json(badRequest(400, 'Cập nhật thất bại!'));
-    }
-
-    const newShift = {
-      ...shift._doc,
-      date: format(shift.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"),
-    };
-
-    res.status(200).json(successfully(newShift, 'Thay đổi dữ liệu thành công !!!'));
-  } catch (error) {
-    res.status(500).json(serverError(error.message));
-  }
-};
-
 
 export const matchOpponent = async (req, res) => {
   try {
     const { idUserFindOpponent, email, phone_number, nameUserFindOpponent } =
       req.body;
-    // const { _id: id_user } = req.user;
-    const id_user = "655c53ed6c0689551d7528a3";
-    const currentUser = await userService.getById(id_user);
+    const currentUser = req.user;
 
-    if (id_user !== idUserFindOpponent) {
+    if (currentUser._id !== idUserFindOpponent) {
       if (email) {
         const sendEmail = async (
           nameUserSendEmail,
@@ -236,7 +226,7 @@ export const matchOpponent = async (req, res) => {
               address: process.env.USER_EMAIL,
             },
             to: email,
-            subject: "Đã tìm được đối sân bóng!",
+            subject: "Tìm được đối sân bóng!",
             text: `Chào ${nameUserSendEmail}. Bạn đã tìm được đối bóng. Họ và Tên: ${name}  -  SĐT: ${phone_number}. Vui lòng liên lạc để ghép kèo!`,
             html: `
             <!DOCTYPE html>
@@ -332,7 +322,7 @@ export const matchOpponent = async (req, res) => {
 
         res.status(200).json({
           error: false,
-          meassge: "Gửi Email thành công!",
+          meassge: "Ghép kèo thành công!",
         });
       } else {
         res.status(400).json(badRequest(400, "Không có email!"));
@@ -801,6 +791,7 @@ export const getShiftBookedByChildPitchAndNumberShift = async (req, res) => {
     res.status(500).json(serverError(error.message));
   }
 };
+
 export const getShiftsByChirldrenPitchBookingMonth = async (req, res) => {
   try {
     const { id: id_chirlden_pitch } = req.params;
@@ -892,6 +883,7 @@ export const getShiftsByChirldrenPitchBookingMonth = async (req, res) => {
     res.status(500).json(serverError(error.message));
   }
 };
+
 export const getShiftsByPitch = async (req, res) => {
   try {
     const { id: id_pitch } = req.params;
