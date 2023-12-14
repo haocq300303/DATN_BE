@@ -31,9 +31,9 @@ const options = {
     definition: {
         openapi: "3.1.0",
         info: {
-            title: "Document hahuudev APIs",
+            title: "Document bóng đá soi cầu APIs",
             version: "1.0",
-            description: "Here is the api documentation of the hahuudev microservice project",
+            description: "Here is the api documentation of the bóng đá soi cầu microservice project",
         },
         servers: [
             {

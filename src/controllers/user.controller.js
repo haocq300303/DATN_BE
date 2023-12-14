@@ -93,6 +93,7 @@ export const login = async (req, res) => {
       createAt: user.createdAt,
       updatedAt: user.updatedAt,
       role_name: role.name,
+      phone_number: user.phone_number,
     };
     const token = await generateToken(values);
     res.status(200).json(successfully({ accessToken: token }));
@@ -294,7 +295,6 @@ export const register = async (req, res) => {
         .status(400)
         .json(badRequest(400, 'Địa chỉ email đã tồn tại trên hệ thống!!!'));
     }
-
     // check phone
     const checkphone = await userService.getByOptions({
       field: 'phone_number',
@@ -314,7 +314,12 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role_id: role_id ? role_id : '655b87021ac3962a68ccf1b5',
     });
-    res.status(200).json(successfully(newUser, 'Thêm thành công !!!'));
+    const token = await generateToken(values);
+    res
+      .status(200)
+      .json(
+        successfully({ ...newUser?.toObject(), token }, 'Thêm thành công !!!')
+      );
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

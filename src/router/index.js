@@ -1,4 +1,4 @@
-import bookingRouter from "./booking.router";
+import bookingRouter from "./booking/booking.router";
 import routerChildrentPitch from "./childrentPitch.router";
 import paymentRouter from "./payment.router";
 import routerPermission from "./permission.router";
