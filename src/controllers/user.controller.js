@@ -273,7 +273,7 @@ export const register = async (req, res) => {
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
-    const { email, password, name, role_id } = req.body;
+    const { email, password, phone_number, name, role_id } = req.body;
     // check name
     const checkNameUser = await userService.getByOptions({
       field: 'name',
@@ -294,11 +294,23 @@ export const register = async (req, res) => {
         .status(400)
         .json(badRequest(400, 'Địa chỉ email đã tồn tại trên hệ thống!!!'));
     }
+
+    // check phone
+    const checkphone = await userService.getByOptions({
+      field: 'phone_number',
+      payload: phone_number,
+    });
+    if (checkphone) {
+      return res
+        .status(400)
+        .json(badRequest(400, 'Số điện thoại đã tồn tại trên hệ thống!!!'));
+    }
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await userService.create({
       name,
       email,
+      phone_number,
       password: hashedPassword,
       role_id: role_id ? role_id : '655b87021ac3962a68ccf1b5',
     });
