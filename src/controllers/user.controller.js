@@ -314,7 +314,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role_id: role_id ? role_id : '655b87021ac3962a68ccf1b5',
     });
-    const token = await generateToken(values);
+    const token = await generateToken(newUser);
     res
       .status(200)
       .json(
