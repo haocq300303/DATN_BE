@@ -314,12 +314,18 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role_id: role_id ? role_id : '655b87021ac3962a68ccf1b5',
     });
-    const token = await generateToken(newUser);
+    const values = {
+      _id: newUser._id,
+      name: newUser.name,
+      role_id: newUser.role_id,
+      email: newUser.email,
+      createAt: newUser.createdAt,
+      updatedAt: newUser.updatedAt,
+    };
+    const token = await generateToken(values);
     res
       .status(200)
-      .json(
-        successfully({ ...newUser?.toObject(), token }, 'Thêm thành công !!!')
-      );
+      .json(successfully({ ...values, token }, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
