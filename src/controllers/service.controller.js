@@ -6,7 +6,7 @@ import * as serviceService from '../services/service.service';
 
 export const getAll = async (req, res) => {
   try {
-    const service = await serviceService.getAll();
+    const service = await serviceService.getAll(req.query);
     res.status(200).json(successfully(service, 'Lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));

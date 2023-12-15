@@ -125,15 +125,7 @@ const pipeLine = [
       status: 1,
       pitch_code: "$childrenPitch.code_chirldren_pitch",
       shift_id: 1,
-      shift: {
-        _id: "$shift._id",
-        number_shift: "$shift.number_shift",
-        start_time: "$shift.start_time",
-        end_time: "$shift.end_time",
-        price: "$shift.price",
-        status_shift: "$shift.status_shift",
-        find_opponent: "$shift.find_opponent",
-      },
+      shift: 1,
       services: {
         $map: {
           input: "$services",
