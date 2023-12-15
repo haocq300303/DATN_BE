@@ -45,16 +45,13 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    console.log('User:', req.user);
-    const { _id: userId } = req.user;
     const { error } = serviceValidation.default.validate(req.body);
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
     const service = await serviceService.update({
-      admin_pitch_id: userId,
-      ...req.body,
       id: req.params.id,
+      ...req.body,
     });
     if (!service) {
       return res

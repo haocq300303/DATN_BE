@@ -61,11 +61,7 @@ routerShift.put(
 );
 
 // Match Opponent
-routerShift.post(
-  "/match-opponent",
-  authMiddleware.verifyToken,
-  shiftController.matchOpponent
-);
+routerShift.post("/match-opponent", shiftController.matchOpponent);
 
 // Get All Shift Find Opponent
 routerShift.get("/find-opponent/all", shiftController.getAllShiftFindOpponent);

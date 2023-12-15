@@ -208,9 +208,28 @@ export const getAllShiftFindOpponentByPitch = async (req, res) => {
 
 export const matchOpponent = async (req, res) => {
   try {
-    const { idUserFindOpponent, email, phone_number, nameUserFindOpponent } =
-      req.body;
-    const currentUser = req.user;
+    const {
+      idUserFindOpponent,
+      email,
+      phone_number,
+      nameUserFindOpponent,
+      currentUserEmail,
+      currentUserPhone,
+      currentUserName,
+    } = req.body;
+
+    let currentUser = null;
+
+    if (!req.user) {
+      currentUser = {
+        _id: "",
+        name: currentUserName,
+        email: currentUserEmail,
+        phone_number: currentUserPhone,
+      };
+    } else {
+      currentUser = req.user;
+    }
 
     if (currentUser._id !== idUserFindOpponent) {
       if (email) {
@@ -293,7 +312,7 @@ export const matchOpponent = async (req, res) => {
             <h1>FSport</h1>
           </header>
           <main>
-          <p>Xin chào ${nameUserSendEmail},</p><p>Bạn đã tìm được đối bóng.</p><p>Thông tin liên lạc: Họ và Tên: ${name}  -  SĐT: ${phone_number}</p><p>Vui lòng liên lạc cho đối thủ của bạn để xác nhận</p>
+          <p>Xin chào ${nameUserSendEmail},</p><p>Bạn đã tìm được đối bóng.</p><p>Thông tin liên lạc:</p><p>Họ và Tên: ${name}  -  SĐT: ${phone_number}</p><p>Vui lòng liên lạc cho đối thủ của bạn để xác nhận</p>
           </main>
           <footer>
             <p>© 2023 FSport</p>
