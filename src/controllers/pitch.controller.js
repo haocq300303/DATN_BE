@@ -65,8 +65,8 @@ export const getAll = async (req, res) => {
           .toLowerCase()
           .includes(searchText.toLowerCase());
         const isPriceMatched =
-          (!minPrice || item.deposit_price >= minPrice) &&
-          (!maxPrice || item.deposit_price <= maxPrice);
+          (!minPrice || item.average_price >= minPrice) &&
+          (!maxPrice || item.average_price <= maxPrice);
         return isNameMatched && isPriceMatched;
       });
       data.data = filteredPitchs;
@@ -78,8 +78,8 @@ export const getAll = async (req, res) => {
     } else if (minPrice || maxPrice) {
       const filteredPitchs = data.data.filter(
         (item) =>
-          (!minPrice || item.deposit_price >= minPrice) &&
-          (!maxPrice || item.deposit_price <= maxPrice)
+          (!minPrice || item.average_price >= minPrice) &&
+          (!maxPrice || item.average_price <= maxPrice)
       );
       data.data = filteredPitchs;
     }
@@ -158,7 +158,7 @@ export const filterFeedBack = async (req, res) => {
         shifts: pitch.shifts,
         services: pitch.services,
         location_id: pitch.location_id,
-        deposit_price: pitch.deposit_price,
+        average_price: pitch.average_price,
         avatar: pitch.avatar,
         comment_id: pitch.comment_id,
         feedback_id: pitch.feedback_id,
