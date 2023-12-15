@@ -1,8 +1,8 @@
 import ServiceModel from "../models/service.model";
 import Pitch from "../models/pitch.model";
 
-export const getAll = async () => {
-    return ServiceModel.find();
+export const getAll = async (query) => {
+    return ServiceModel.find(query);
 }
 
 export const getOneService = async (serviceId) => {
