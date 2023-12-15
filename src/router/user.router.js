@@ -5,12 +5,7 @@ import { authMiddleware } from '../middlewares';
 const routerUser = express.Router();
 
 // GET ALL
-routerUser.get(
-  '/users',
-  authMiddleware.verifyToken,
-  authMiddleware.verifyAdmin,
-  userController.getList
-);
+routerUser.get('/users', authMiddleware.verifyToken, userController.getList);
 
 // GET BY ID
 routerUser.get(

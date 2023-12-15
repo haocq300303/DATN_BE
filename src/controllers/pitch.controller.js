@@ -1,19 +1,19 @@
-import moment from "moment";
-import { badRequest } from "../formatResponse/badRequest";
-import { serverError } from "../formatResponse/serverError";
-import { successfully } from "../formatResponse/successfully";
-import { feedbackService, pitchService, serviceService } from "../services";
-import { pitchValidation } from "../validations";
-import fs from "fs";
-const locationJson = JSON.parse(fs.readFileSync("locations.json"));
+import moment from 'moment';
+import { badRequest } from '../formatResponse/badRequest';
+import { serverError } from '../formatResponse/serverError';
+import { successfully } from '../formatResponse/successfully';
+import { feedbackService, pitchService, serviceService } from '../services';
+import { pitchValidation } from '../validations';
+import fs from 'fs';
+const locationJson = JSON.parse(fs.readFileSync('locations.json'));
 
 export const getAll = async (req, res) => {
   try {
     const {
       page = 1,
       limit = 7,
-      _sort = "createdAt",
-      _order = "asc",
+      _sort = 'createdAt',
+      _order = 'asc',
       districtId,
       wardId,
       searchText,
@@ -26,17 +26,17 @@ export const getAll = async (req, res) => {
       page,
       limit,
       sort: {
-        [_sort]: _order === "desc" ? -1 : 1,
+        [_sort]: _order === 'desc' ? -1 : 1,
       },
       ...params,
       customLabels: {
-        docs: "data",
+        docs: 'data',
       },
     };
     const pitchs = await pitchService.getAllPitch(options);
 
     if (!pitchs || pitchs.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(404, 'Không có dữ liệu!'));
     }
 
     const { data: dataPitch, ...pagi } = pitchs;
@@ -86,7 +86,7 @@ export const getAll = async (req, res) => {
 
     res
       .status(200)
-      .json(successfully({ ...data, ...pagi }, "Lấy dữ liệu thành công"));
+      .json(successfully({ ...data, ...pagi }, 'Lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -98,8 +98,8 @@ export const filterFeedBack = async (req, res) => {
     const {
       page = 1,
       limit = 7,
-      _sort = "createdAt",
-      _order = "asc",
+      _sort = 'createdAt',
+      _order = 'asc',
       minStart,
       maxStart,
       ...params
@@ -109,18 +109,18 @@ export const filterFeedBack = async (req, res) => {
       page,
       limit,
       sort: {
-        [_sort]: _order === "desc" ? -1 : 1,
+        [_sort]: _order === 'desc' ? -1 : 1,
       },
       ...params,
       customLabels: {
-        docs: "data",
+        docs: 'data',
       },
     };
 
     const pitchs = await pitchService.filterFeedbackPitch(options);
 
     if (!pitchs || pitchs.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(404, 'Không có dữ liệu!'));
     }
 
     const { data: dataPitch, ...pagi } = pitchs;
@@ -177,7 +177,7 @@ export const filterFeedBack = async (req, res) => {
       .json(
         successfully(
           { data: filteredPitches, ...pagi },
-          "Lấy dữ liệu thành công"
+          'Lấy dữ liệu thành công'
         )
       );
   } catch (error) {
@@ -191,20 +191,20 @@ export const getById = async (req, res) => {
     const pitch = await pitchService.getOnePitch(req.params.id);
 
     if (!pitch) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(404, 'Không có dữ liệu!'));
     }
     const pitchOneWithVietnamTime = {
       ...pitch.toObject(),
       createdAt: moment(pitch.createdAt)
         .utcOffset(7)
-        .format("DD/MM/YYYY - HH:mm"),
+        .format('DD/MM/YYYY - HH:mm'),
       updatedAt: moment(pitch.updatedAt)
         .utcOffset(7)
-        .format("DD/MM/YYYY - HH:mm"),
+        .format('DD/MM/YYYY - HH:mm'),
     };
     res
       .status(200)
-      .json(successfully(pitchOneWithVietnamTime, "Lấy dữ liệu thành công"));
+      .json(successfully(pitchOneWithVietnamTime, 'Lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -216,7 +216,7 @@ export const getPichByUser = async (req, res) => {
     const pitches = await pitchService.getPitchByUser(userId);
 
     if (!pitches || pitches.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(200).json(badRequest(400, 'Không có dữ liệu!'));
     }
 
     const updatedPitches = pitches.map((pitch) => {
@@ -233,16 +233,16 @@ export const getPichByUser = async (req, res) => {
         districts_id: district ? district.name : pitch.districts_id,
         createdAt: moment(pitch.createdAt)
           .utcOffset(7)
-          .format("DD/MM/YYYY - HH:mm"),
+          .format('DD/MM/YYYY - HH:mm'),
         updatedAt: moment(pitch.updatedAt)
           .utcOffset(7)
-          .format("DD/MM/YYYY - HH:mm"),
+          .format('DD/MM/YYYY - HH:mm'),
       };
     });
 
     res
       .status(200)
-      .json(successfully(updatedPitches[0], "Lấy dữ liệu thành công"));
+      .json(successfully(updatedPitches[0], 'Lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -253,7 +253,7 @@ export const getService = async (req, res) => {
   try {
     const pitch = await pitchService.getServiceAdminPitch(req.params.id);
     if (!pitch) {
-      return res.status(404).json({ error: "Lấy dữ liệu không thành công" });
+      return res.status(404).json({ error: 'Lấy dữ liệu không thành công' });
     }
     const serviceData = await Promise.all(
       pitch.services.map(async (serviceId) => {
@@ -266,15 +266,15 @@ export const getService = async (req, res) => {
           image: service.image,
           createdAt: moment(service.createdAt)
             .utcOffset(7)
-            .format("DD/MM/YYYY - HH:mm"),
+            .format('DD/MM/YYYY - HH:mm'),
           updatedAt: moment(service.updatedAt)
             .utcOffset(7)
-            .format("DD/MM/YYYY - HH:mm"),
+            .format('DD/MM/YYYY - HH:mm'),
         };
         return serviceWithVietnamTime;
       })
     );
-    res.status(200).json(successfully(serviceData, "Lấy dữ liệu thành công"));
+    res.status(200).json(successfully(serviceData, 'Lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -286,7 +286,7 @@ export const getFeedbackPitch = async (req, res) => {
     const pitch = await pitchService.getFeedbackPitch(req.params.id);
 
     if (!pitch) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(404, 'Không có dữ liệu!'));
     }
     const feedbackData = await Promise.all(
       pitch.feedback_id.map(async (feedbackId) => {
@@ -298,10 +298,10 @@ export const getFeedbackPitch = async (req, res) => {
           quantity_star: feedback.quantity_star,
           createdAt: moment(feedback.createdAt)
             .utcOffset(7)
-            .format("DD/MM/YYYY - HH:mm"),
+            .format('DD/MM/YYYY - HH:mm'),
           updatedAt: moment(feedback.updatedAt)
             .utcOffset(7)
-            .format("DD/MM/YYYY - HH:mm"),
+            .format('DD/MM/YYYY - HH:mm'),
         };
         return feedbackWithVietnamTime;
       })
@@ -315,7 +315,7 @@ export const getFeedbackPitch = async (req, res) => {
 
     res
       .status(200)
-      .json(successfully(formattedPitchFeedback, "Lấy dữ liệu thành công"));
+      .json(successfully(formattedPitchFeedback, 'Lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -330,10 +330,10 @@ export const create = async (req, res) => {
 
     const pitch = await pitchService.creatPitch(req.body);
     if (!pitch) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Thêm không thành công !!!'));
     }
 
-    res.status(200).json(successfully(pitch, "Thêm thành công !!!"));
+    res.status(200).json(successfully(pitch, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -341,7 +341,7 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    console.log("User:", req.user);
+    console.log('User:', req.user);
     const { _id: userId } = req.user;
     const { error } = pitchValidation.default.validate(req.body);
     if (error) {
@@ -353,20 +353,20 @@ export const update = async (req, res) => {
       id: req.params.id,
     });
     if (!pitch) {
-      return res.status(400).json(badRequest(400, "Sửa không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Sửa không thành công !!!'));
     }
     const pitchUpdateVietnam = {
       ...pitch.toObject(),
       createdAt: moment(pitch.createdAt)
         .utcOffset(7)
-        .format("DD/MM/YYYY - HH:mm"),
+        .format('DD/MM/YYYY - HH:mm'),
       updatedAt: moment(pitch.updatedAt)
         .utcOffset(7)
-        .format("DD/MM/YYYY - HH:mm"),
+        .format('DD/MM/YYYY - HH:mm'),
     };
     res
       .status(200)
-      .json(successfully(pitchUpdateVietnam, "Sửa thành công !!!"));
+      .json(successfully(pitchUpdateVietnam, 'Sửa thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -376,10 +376,10 @@ export const remove = async (req, res) => {
   try {
     const pitch = await pitchService.deletePitch(req.params.id);
     if (!pitch) {
-      return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Xóa không thành công !!!'));
     }
 
-    res.status(200).json(successfully(pitch, "Xóa thành công !!!"));
+    res.status(200).json(successfully(pitch, 'Xóa thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }

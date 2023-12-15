@@ -1,20 +1,20 @@
-import { addDays, format, parse, subDays } from "date-fns";
-import "dotenv/config";
-import { badRequest } from "../formatResponse/badRequest";
-import { serverError } from "../formatResponse/serverError";
-import { successfully } from "../formatResponse/successfully";
-import { childrenPitchService, pitchService, shiftService } from "../services";
-import { transporter } from "../utils/sendEmail";
-import { shiftValidation } from "../validations";
-import * as BookingService from "../services/booking.service";
+import { addDays, format, parse, subDays } from 'date-fns';
+import 'dotenv/config';
+import { badRequest } from '../formatResponse/badRequest';
+import { serverError } from '../formatResponse/serverError';
+import { successfully } from '../formatResponse/successfully';
+import { childrenPitchService, pitchService, shiftService } from '../services';
+import { transporter } from '../utils/sendEmail';
+import { shiftValidation } from '../validations';
+import * as BookingService from '../services/booking.service';
 
 export const getAll = async (req, res) => {
   try {
     const shifts = await shiftService.getAll();
     if (!shifts || shifts.length === 0) {
-      return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(400, 'Không có dữ liệu!'));
     }
-    res.status(200).json(successfully(shifts, "lấy dữ liệu thành công"));
+    res.status(200).json(successfully(shifts, 'lấy dữ liệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -24,10 +24,10 @@ export const getByID = async (req, res) => {
   try {
     const shift = await shiftService.getById(req.params.id);
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Không có sân nào cả"));
+      return res.status(400).json(badRequest(400, 'Không có sân nào cả'));
     }
 
-    res.status(200).json(successfully(shift, "lấy dữ lệu thành công"));
+    res.status(200).json(successfully(shift, 'lấy dữ lệu thành công'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -47,10 +47,10 @@ export const create = async (req, res) => {
 
     const pastDate = subDays(newDate, 30);
 
-    const formattedCurrentDate = format(newDate, "yyyy-MM-dd");
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedCurrentDate = format(newDate, 'yyyy-MM-dd');
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
     const bookedShifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [
         {
           date: {
@@ -71,7 +71,7 @@ export const create = async (req, res) => {
       return res.status(400).json({
         error: true,
         statusCode: 400,
-        message: "Ca bạn đặt đã được đặt trước đó!! Vui lòng chọn ca khác!!!",
+        message: 'Ca bạn đặt đã được đặt trước đó!! Vui lòng chọn ca khác!!!',
         data: bookedShifts,
       });
     }
@@ -79,10 +79,10 @@ export const create = async (req, res) => {
     const shift = await shiftService.creat(data);
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Thêm không thành công !!!'));
     }
 
-    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
+    res.status(200).json(successfully(shift, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -98,10 +98,10 @@ export const update = async (req, res) => {
     if (!shift) {
       return res
         .status(400)
-        .json(badRequest(400, "Cập nhật không thành công !!!"));
+        .json(badRequest(400, 'Cập nhật không thành công !!!'));
     }
 
-    res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
+    res.status(200).json(successfully(shift, 'Cập nhật thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -111,10 +111,10 @@ export const remove = async (req, res) => {
   try {
     const shift = await shiftService.remove(req.params.id);
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Xóa không thành công !!!'));
     }
 
-    res.status(200).json(successfully(shift, "Xóa thành công !!!"));
+    res.status(200).json(successfully(shift, 'Xóa thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -128,12 +128,12 @@ export const find_opponent = async (req, res) => {
     const shift = await shiftService.update(shift_id, { find_opponent });
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
+      return res.status(400).json(badRequest(400, 'Cập nhật thất bại!'));
     }
 
     res
       .status(200)
-      .json(successfully(shift, "Thay đổi dữ liệu thành công !!!"));
+      .json(successfully(shift, 'Thay đổi dữ liệu thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -141,18 +141,18 @@ export const find_opponent = async (req, res) => {
 
 export const getAllShiftFindOpponent = async (req, res) => {
   try {
-    const today = format(new Date(), "yyyy-MM-dd");
+    const today = format(new Date(), 'yyyy-MM-dd');
 
     const shifts = await shiftService.getListByOptionsPopulate({
-      field: "$and",
+      field: '$and',
       payload: [
-        { find_opponent: "Find" },
+        { find_opponent: 'Find' },
         { date: { $elemMatch: { $gte: today } } },
       ],
     });
 
     if (!shifts || shifts.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(404, 'Không có dữ liệu!'));
     }
 
     const newShifts = [];
@@ -165,7 +165,7 @@ export const getAllShiftFindOpponent = async (req, res) => {
       newShifts.push({ ...shift._doc, user: bookingDb?.user_booking });
     }
 
-    res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
+    res.status(200).json(successfully(newShifts, 'Lấy dữ liệu thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -175,19 +175,19 @@ export const getAllShiftFindOpponentByPitch = async (req, res) => {
   try {
     const { id: id_pitch } = req.params;
 
-    const today = format(new Date(), "yyyy-MM-dd");
+    const today = format(new Date(), 'yyyy-MM-dd');
 
     const shifts = await shiftService.getListByOptionsPopulate({
-      field: "$and",
+      field: '$and',
       payload: [
         { id_pitch },
-        { find_opponent: "Find" },
+        { find_opponent: 'Find' },
         { date: { $elemMatch: { $gte: today } } },
       ],
     });
 
     if (!shifts || shifts.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+      return res.status(404).json(badRequest(404, 'Không có dữ liệu!'));
     }
 
     const newShifts = [];
@@ -200,7 +200,7 @@ export const getAllShiftFindOpponentByPitch = async (req, res) => {
       newShifts.push({ ...shift._doc, user: bookingDb?.user_booking });
     }
 
-    res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
+    res.status(200).json(successfully(newShifts, 'Lấy dữ liệu thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -222,11 +222,11 @@ export const matchOpponent = async (req, res) => {
         ) => {
           await transporter.sendMail({
             from: {
-              name: "FSport",
+              name: 'FSport',
               address: process.env.USER_EMAIL,
             },
             to: email,
-            subject: "Tìm được đối sân bóng!",
+            subject: 'Tìm được đối sân bóng!',
             text: `Chào ${nameUserSendEmail}. Bạn đã tìm được đối bóng. Họ và Tên: ${name}  -  SĐT: ${phone_number}. Vui lòng liên lạc để ghép kèo!`,
             html: `
             <!DOCTYPE html>
@@ -322,15 +322,15 @@ export const matchOpponent = async (req, res) => {
 
         res.status(200).json({
           error: false,
-          meassge: "Ghép kèo thành công!",
+          meassge: 'Ghép kèo thành công!',
         });
       } else {
-        res.status(400).json(badRequest(400, "Không có email!"));
+        res.status(400).json(badRequest(400, 'Không có email!'));
       }
     } else {
       res
         .status(400)
-        .json(badRequest(400, "Bạn không thể tự ghép kèo với mình!"));
+        .json(badRequest(400, 'Bạn không thể tự ghép kèo với mình!'));
     }
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -342,25 +342,25 @@ export const getAllShiftByChirldrenPitch = async (req, res) => {
     const { id: id_chirlden_pitch } = req.params;
     const { date, id_pitch } = req.query;
 
-    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
+    const newDate = date ? date : format(new Date(), 'yyyy-MM-dd');
 
     const shiftsDefault = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch }],
     });
 
     if (!shiftsDefault || shiftsDefault.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có shifts default!"));
+      return res.status(404).json(badRequest(404, 'Không có shifts default!'));
     }
 
-    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+    const dateObject = parse(newDate, 'yyyy-MM-dd', new Date());
     // Lấy ngày 30 ngày trước
     const pastDate = subDays(dateObject, 29);
 
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
 
     const shifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [
         { id_chirlden_pitch },
         {
@@ -417,7 +417,7 @@ export const getAllShiftByChirldrenPitch = async (req, res) => {
       ).is_booking_month,
     }));
 
-    res.status(200).json(successfully(results, "lấy dữ lệu thành công!"));
+    res.status(200).json(successfully(results, 'lấy dữ lệu thành công!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -431,12 +431,12 @@ export const changeStatusShift = async (req, res) => {
     const shift = await shiftService.update(shift_id, { status_shift });
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Cập nhật thất bại!"));
+      return res.status(400).json(badRequest(400, 'Cập nhật thất bại!'));
     }
 
     res
       .status(200)
-      .json(successfully(shift, "Thay đổi dữ liệu thành công !!!"));
+      .json(successfully(shift, 'Thay đổi dữ liệu thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -455,11 +455,11 @@ export const createShiftDefault = async (req, res) => {
     const shift = await shiftService.creat(data);
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Thêm không thành công !!!'));
     }
 
     const shifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch: shift.id_pitch }],
     });
 
@@ -472,7 +472,7 @@ export const createShiftDefault = async (req, res) => {
       average_price: averagePrice,
     });
 
-    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
+    res.status(200).json(successfully(shift, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -488,11 +488,11 @@ export const updateShiftDefault = async (req, res) => {
     if (!shift) {
       return res
         .status(400)
-        .json(badRequest(400, "Cập nhật không thành công !!!"));
+        .json(badRequest(400, 'Cập nhật không thành công !!!'));
     }
 
     const shifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch: shift.id_pitch }],
     });
 
@@ -505,7 +505,7 @@ export const updateShiftDefault = async (req, res) => {
       average_price: averagePrice,
     });
 
-    res.status(200).json(successfully(shift, "Cập nhật thành công !!!"));
+    res.status(200).json(successfully(shift, 'Cập nhật thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -515,11 +515,11 @@ export const deleteShiftDefault = async (req, res) => {
   try {
     const shift = await shiftService.remove(req.params.id);
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Xóa không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Xóa không thành công !!!'));
     }
 
     const shifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch: shift.id_pitch }],
     });
 
@@ -532,7 +532,7 @@ export const deleteShiftDefault = async (req, res) => {
       average_price: averagePrice,
     });
 
-    res.status(200).json(successfully(shift, "Xóa thành công !!!"));
+    res.status(200).json(successfully(shift, 'Xóa thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -543,15 +543,15 @@ export const getAllShiftDefaultByPitch = async (req, res) => {
     const { id: id_pitch } = req.params;
 
     const shifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch }],
     });
 
     if (!shifts || shifts.length === 0) {
-      return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+      return res.status(200).json(successfully([], 'lấy dữ lệu thành công!'));
     }
 
-    res.status(200).json(successfully(shifts, "lấy dữ lệu thành công!"));
+    res.status(200).json(successfully(shifts, 'lấy dữ lệu thành công!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -568,7 +568,7 @@ export const bookMultipleDay = async (req, res) => {
     }
 
     const bookedShifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [
         { date: { $in: data.date } },
         { id_chirlden_pitch: data.id_chirlden_pitch },
@@ -581,7 +581,7 @@ export const bookMultipleDay = async (req, res) => {
         error: true,
         statusCode: 400,
         message:
-          "Trong số ca bạn đặt đã có ca được đặt trước đó!! Vui lòng chọn ca khác!!!",
+          'Trong số ca bạn đặt đã có ca được đặt trước đó!! Vui lòng chọn ca khác!!!',
         data: bookedShifts,
       });
     }
@@ -591,10 +591,10 @@ export const bookMultipleDay = async (req, res) => {
     const shift = await shiftService.creat(data);
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Thêm không thành công !!!'));
     }
 
-    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
+    res.status(200).json(successfully(shift, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -617,12 +617,12 @@ export const bookOneShiftFullMonth = async (req, res) => {
     const futureDate = addDays(currentDate, 29);
     const pastDate = subDays(currentDate, 29);
 
-    const formattedCurrentDate = format(currentDate, "yyyy-MM-dd");
-    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedCurrentDate = format(currentDate, 'yyyy-MM-dd');
+    const formattedFutureDate = format(futureDate, 'yyyy-MM-dd');
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
 
     const bookedShifts = await shiftService.getListByOptions({
-      field: "$or",
+      field: '$or',
       payload: [
         {
           id_chirlden_pitch: data.id_chirlden_pitch,
@@ -650,7 +650,7 @@ export const bookOneShiftFullMonth = async (req, res) => {
         error: true,
         statusCode: 400,
         message:
-          "Ca bạn đặt trong một tháng đã có ca được đặt trước!! Vui lòng chọn ca khác!!!",
+          'Ca bạn đặt trong một tháng đã có ca được đặt trước!! Vui lòng chọn ca khác!!!',
         data: bookedShifts,
       });
     }
@@ -661,10 +661,10 @@ export const bookOneShiftFullMonth = async (req, res) => {
     const shift = await shiftService.creat(data);
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Thêm không thành công !!!'));
     }
 
-    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
+    res.status(200).json(successfully(shift, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -687,12 +687,12 @@ export const bookChildrenPicthFullMonth = async (req, res) => {
     const futureDate = addDays(currentDate, 29);
     const pastDate = subDays(currentDate, 29);
 
-    const formattedCurrentDate = format(currentDate, "yyyy-MM-dd");
-    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedCurrentDate = format(currentDate, 'yyyy-MM-dd');
+    const formattedFutureDate = format(futureDate, 'yyyy-MM-dd');
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
 
     const bookedShifts = await shiftService.getListByOptions({
-      field: "$or",
+      field: '$or',
       payload: [
         {
           id_chirlden_pitch: data.id_chirlden_pitch,
@@ -718,7 +718,7 @@ export const bookChildrenPicthFullMonth = async (req, res) => {
         error: true,
         statusCode: 400,
         message:
-          "Sân bạn đặt trong một tháng đã có ca đặt trước!! Vui lòng chọn sân khác!!!",
+          'Sân bạn đặt trong một tháng đã có ca đặt trước!! Vui lòng chọn sân khác!!!',
         data: bookedShifts,
       });
     }
@@ -728,10 +728,10 @@ export const bookChildrenPicthFullMonth = async (req, res) => {
     const shift = await shiftService.creat(data);
 
     if (!shift) {
-      return res.status(400).json(badRequest(400, "Thêm không thành công !!!"));
+      return res.status(400).json(badRequest(400, 'Thêm không thành công !!!'));
     }
 
-    res.status(200).json(successfully(shift, "Thêm thành công !!!"));
+    res.status(200).json(successfully(shift, 'Thêm thành công !!!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -749,12 +749,12 @@ export const getShiftBookedByChildPitchAndNumberShift = async (req, res) => {
     const futureDate = addDays(currentDate, 29);
     const pastDate = subDays(currentDate, 29);
 
-    const formattedCurrentDate = format(currentDate, "yyyy-MM-dd");
-    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedCurrentDate = format(currentDate, 'yyyy-MM-dd');
+    const formattedFutureDate = format(futureDate, 'yyyy-MM-dd');
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
 
     const shifts = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [
         { id_chirlden_pitch },
         {
@@ -786,7 +786,7 @@ export const getShiftBookedByChildPitchAndNumberShift = async (req, res) => {
       ],
     });
 
-    res.status(200).json(successfully(shifts, "lấy dữ lệu thành công!"));
+    res.status(200).json(successfully(shifts, 'lấy dữ lệu thành công!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -797,30 +797,30 @@ export const getShiftsByChirldrenPitchBookingMonth = async (req, res) => {
     const { id: id_chirlden_pitch } = req.params;
     const { date, id_pitch } = req.query;
 
-    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
+    const newDate = date ? date : format(new Date(), 'yyyy-MM-dd');
 
     const shiftsDefault = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch }],
     });
 
     if (!shiftsDefault || shiftsDefault.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có shifts default!"));
+      return res.status(404).json(badRequest(404, 'Không có shifts default!'));
     }
 
-    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+    const dateObject = parse(newDate, 'yyyy-MM-dd', new Date());
 
     // Ngày sau 30 ngày
     const futureDate = addDays(dateObject, 29);
     // Lấy ngày 30 ngày trước
     const pastDate = subDays(dateObject, 29);
 
-    const formattedCurrentDate = format(dateObject, "yyyy-MM-dd");
-    const formattedFutureDate = format(futureDate, "yyyy-MM-dd");
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedCurrentDate = format(dateObject, 'yyyy-MM-dd');
+    const formattedFutureDate = format(futureDate, 'yyyy-MM-dd');
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
 
     const shifts = await shiftService.getListByOptions({
-      field: "$or",
+      field: '$or',
       payload: [
         {
           id_chirlden_pitch,
@@ -878,7 +878,7 @@ export const getShiftsByChirldrenPitchBookingMonth = async (req, res) => {
       ).is_booking_month,
     }));
 
-    res.status(200).json(successfully(results, "lấy dữ lệu thành công!"));
+    res.status(200).json(successfully(results, 'lấy dữ lệu thành công!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -889,35 +889,35 @@ export const getShiftsByPitch = async (req, res) => {
     const { id: id_pitch } = req.params;
     const { date } = req.query;
 
-    const newDate = date ? date : format(new Date(), "yyyy-MM-dd");
+    const newDate = date ? date : format(new Date(), 'yyyy-MM-dd');
 
     const childrenPitchs = await childrenPitchService.getChildrenPitchsByParent(
       id_pitch
     );
 
-    if (!childrenPitchs || childrenPitchs.length === 0) {
-      return res.status(400).json(badRequest(400, "Không dữ liệu!"));
+    if (!childrenPitchs) {
+      return res.status(400).json(badRequest(400, 'Không dữ liệu!'));
     }
 
     const shiftsDefault = await shiftService.getListByOptions({
-      field: "$and",
+      field: '$and',
       payload: [{ default: true }, { id_pitch }],
     });
 
-    if (!shiftsDefault || shiftsDefault.length === 0) {
-      return res.status(404).json(badRequest(404, "Không có shifts default!"));
+    if (!shiftsDefault) {
+      return res.status(404).json(badRequest(404, 'Không có shifts default!'));
     }
 
-    const dateObject = parse(newDate, "yyyy-MM-dd", new Date());
+    const dateObject = parse(newDate, 'yyyy-MM-dd', new Date());
     // Lấy ngày 30 ngày trước
     const pastDate = subDays(dateObject, 29);
-    const formattedPastDate = format(pastDate, "yyyy-MM-dd");
+    const formattedPastDate = format(pastDate, 'yyyy-MM-dd');
 
     const newShifts = [];
 
     for (const childrenPitch of childrenPitchs) {
       const shifts = await shiftService.getListByOptions({
-        field: "$and",
+        field: '$and',
         payload: [
           { id_chirlden_pitch: childrenPitch._id },
           {
@@ -997,7 +997,7 @@ export const getShiftsByPitch = async (req, res) => {
       newShifts.push(...results);
     }
 
-    res.status(200).json(successfully(newShifts, "lấy dữ lệu thành công!"));
+    res.status(200).json(successfully(newShifts, 'lấy dữ lệu thành công!'));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
