@@ -49,6 +49,10 @@ const shiftSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isCancelBooking: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true, versionKey: false }
 );

@@ -131,6 +131,7 @@ export const getChildrenPitchsByParent = async (req, res) => {
           field: "$and",
           payload: [
             { id_chirlden_pitch: childrenPitch._id },
+            { isCancelBooking: { $ne: true } },
             {
               $or: [
                 { date: { $in: [newDate] } },
@@ -230,6 +231,7 @@ export const getChildrenPitchsByParentBookingMonth = async (req, res) => {
         payload: [
           {
             id_chirlden_pitch: childrenPitch._id,
+            isCancelBooking: { $ne: true },
             date: {
               $elemMatch: {
                 $gte: formattedCurrentDate,
@@ -239,6 +241,7 @@ export const getChildrenPitchsByParentBookingMonth = async (req, res) => {
           },
           {
             id_chirlden_pitch: childrenPitch._id,
+            isCancelBooking: { $ne: true },
             date: {
               $elemMatch: {
                 $gte: formattedPastDate,
