@@ -126,7 +126,6 @@ class PayMentController {
                                             `/checkout?mode=order&code=${vnp_Params["vnp_TxnRef"]}&payment_id=${newPayment._id}`
                                     );
                                 }
-
                             } else {
                                 res.redirect(process.env.NODE_URL_CLIENT + "/checkout");
                             }
