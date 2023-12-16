@@ -12,6 +12,7 @@ const shiftSchema = Joi.object({
   find_opponent: Joi.string(),
   default: Joi.boolean(),
   is_booking_month: Joi.boolean(),
+  isCancelBooking: Joi.boolean(),
 });
 
 export default shiftSchema;

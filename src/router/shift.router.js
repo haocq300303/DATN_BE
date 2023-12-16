@@ -11,7 +11,7 @@ routerShift.get("/", shiftController.getAll);
 routerShift.get("/:id", shiftController.getByID);
 
 // Create
-routerShift.post("/", shiftController.create);
+routerShift.post("/", authMiddleware.verifyToken, shiftController.create);
 
 // Create Shift Default
 routerShift.post(
@@ -96,19 +96,20 @@ routerShift.get(
 routerShift.post(
   "/book-multiple-day",
   authMiddleware.verifyToken,
-  authMiddleware.verifyAdminPitch,
   shiftController.bookMultipleDay
 );
 
 // Book One Shift Full Month
 routerShift.post(
   "/book-one-shift-full-month",
+  authMiddleware.verifyToken,
   shiftController.bookOneShiftFullMonth
 );
 
 // Book Children Picth Full Month
 routerShift.post(
   "/book-childrenPicth-full-month",
+  authMiddleware.verifyToken,
   shiftController.bookChildrenPicthFullMonth
 );
 
@@ -126,5 +127,12 @@ routerShift.get(
 
 // Get Shifts By Pitch
 routerShift.get("/pitch/:id", shiftController.getShiftsByPitch);
+
+// Cancel Booking
+routerShift.put(
+  "/cancel-booking/:id",
+  authMiddleware.verifyToken,
+  shiftController.cancelBooking
+);
 
 export default routerShift;

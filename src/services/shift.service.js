@@ -16,7 +16,7 @@ export const getListByOptionsPopulate = (options) => {
   return shiftModel.find(query).populate(["id_pitch", "id_chirlden_pitch"]);
 };
 export const getById = async (id) => {
-  return shiftModel.findById(id);
+  return shiftModel.findById(id).populate("id_pitch");
 };
 export const creat = async (data) => {
   return shiftModel.create(data);
