@@ -111,7 +111,7 @@ export const getChildrenPitchsByParent = async (req, res) => {
     );
 
     if (!childrenPitchs || childrenPitchs.length === 0) {
-      return res.status(400).json(badRequest(400, "Không dữ liệu!"));
+      return res.status(200).json(successfully([], "Không dữ liệu!"));
     }
 
     const shiftsDefault = await shiftService.getListByOptions({
@@ -120,7 +120,7 @@ export const getChildrenPitchsByParent = async (req, res) => {
     });
 
     if (!shiftsDefault || shiftsDefault.length === 0) {
-      return res.status(404).json(badRequest(400, "Không có dữ liệu!"));
+      return res.status(200).json(successfully([], "Không dữ liệu!"));
     }
 
     const newChildrenPitchs = [];
