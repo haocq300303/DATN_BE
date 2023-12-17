@@ -7,6 +7,8 @@ import { childrenPitchService, pitchService, shiftService } from "../services";
 import { transporter } from "../utils/sendEmail";
 import { shiftValidation } from "../validations";
 import * as BookingService from "../services/booking.service";
+import fs from "fs";
+const locationJson = JSON.parse(fs.readFileSync("locations.json"));
 
 export const getAll = async (req, res) => {
   try {
@@ -142,6 +144,7 @@ export const find_opponent = async (req, res) => {
 
 export const getAllShiftFindOpponent = async (req, res) => {
   try {
+    const { districtId, wardId } = req.query;
     const today = format(new Date(), "yyyy-MM-dd");
 
     const shifts = await shiftService.getListByOptionsPopulate({
@@ -167,7 +170,27 @@ export const getAllShiftFindOpponent = async (req, res) => {
       newShifts.push({ ...shift._doc, user: bookingDb?.user_booking });
     }
 
-    res.status(200).json(successfully(newShifts, "Lấy dữ liệu thành công !!!"));
+    let newData = [];
+    if (districtId) {
+      const wardIdsInDistricts = locationJson.wards
+        .filter((ward) => ward.parent === districtId)
+        .map((ward) => ward.id);
+
+      const shiftsClone = newShifts.filter((item) =>
+        wardIdsInDistricts.includes(item.id_pitch.location_id)
+      );
+
+      newData = [...shiftsClone];
+    } else if (wardId) {
+      const shiftsClone = newShifts.filter(
+        (item) => item.id_pitch.location_id === wardId
+      );
+      newData = [...shiftsClone];
+    } else {
+      newData = [...newShifts];
+    }
+
+    res.status(200).json(successfully(newData, "Lấy dữ liệu thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
