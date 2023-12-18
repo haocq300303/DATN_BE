@@ -120,7 +120,9 @@ export const getChildrenPitchsByParent = async (req, res) => {
     });
 
     if (!shiftsDefault || shiftsDefault.length === 0) {
-      return res.status(200).json(successfully([], "Không dữ liệu!"));
+      return res
+        .status(200)
+        .json(successfully(childrenPitchs, "Không dữ liệu!"));
     }
 
     const newChildrenPitchs = [];
