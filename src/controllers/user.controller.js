@@ -446,7 +446,7 @@ export const changePassword = async (req, res) => {
     const isMatch = await bcrypt.compare(password, checkUser.password);
     if (!isMatch) {
       return res
-        .status(400)
+        .status(200)
         .json(
           badRequest(
             400,
