@@ -443,7 +443,7 @@ export const changePassword = async (req, res) => {
   try {
     const { password, new_password, user_id } = req.body;
     const checkUser = await userService.getById(user_id);
-    const isMatch = bcrypt.compare(password, checkUser.password);
+    const isMatch = await bcrypt.compare(password, checkUser.password);
     if (!isMatch) {
       return res
         .status(400)
