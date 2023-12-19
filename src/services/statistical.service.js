@@ -70,7 +70,7 @@ export const getRevenueByYear = async (year, pitchUser) => {
                                         0,
                                     ],
                                 },
-                                { month: "$$monthIndex", totalPrice: 0, totalBooking: 0 },
+                                { month: "$$monthIndex", totalPrice: 0, totalBooking: 0, successCount: 0, cancelCount: 0 },
                             ],
                         },
                     },
