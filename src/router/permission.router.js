@@ -1,21 +1,42 @@
-import express from "express";
-import { permissionController } from "../controllers";
+import express from 'express';
+import { permissionController } from '../controllers';
+import { authMiddleware } from '../middlewares';
 
 const routerPermission = express.Router();
 
 // GET ALL
-routerPermission.get("/", permissionController.getAll);
+routerPermission.get(
+  '/',
+  authMiddleware.verifyToken,
+  permissionController.getAll
+);
 
 // GET BY ID
-routerPermission.get("/:id", permissionController.getById);
+routerPermission.get(
+  '/:id',
+  authMiddleware.verifyToken,
+  permissionController.getById
+);
 
 // CREATE
-routerPermission.post("/", permissionController.create);
+routerPermission.post(
+  '/',
+  authMiddleware.verifyToken,
+  permissionController.create
+);
 
 // UPDATE
-routerPermission.put("/:id", permissionController.update);
+routerPermission.put(
+  '/:id',
+  authMiddleware.verifyToken,
+  permissionController.update
+);
 
 // DELETE
-routerPermission.delete("/:id", permissionController.remove);
+routerPermission.delete(
+  '/:id',
+  authMiddleware.verifyToken,
+  permissionController.remove
+);
 
 export default routerPermission;

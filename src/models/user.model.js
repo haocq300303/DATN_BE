@@ -1,10 +1,9 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     phone_number: {
       type: String,
@@ -25,4 +24,4 @@ const userSchema = new Schema(
   }
 );
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model('User', userSchema);

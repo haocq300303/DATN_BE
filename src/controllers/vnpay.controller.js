@@ -44,6 +44,7 @@ class PayMentController {
             let vnpUrl = config.vnp_Url;
             let returnUrl = config.vnp_ReturnUrl + `?user_bank=${user_bank}&user_receiver=${user_receiver}&total_received=${total_received}`;
             let orderId = moment(date).format("DDHHmmss");
+            console.log(price_received);
 
             let currCode = "VND";
             let vnp_Params = {};
@@ -113,8 +114,8 @@ class PayMentController {
                                     const newPayment = await PaymentModel.create({
                                         user_bank,
                                         user_receiver,
-                                        price_received: vnp_Params["vnp_Amount"],
-                                        total_received: total_received * 1000,
+                                        price_received: vnp_Params["vnp_Amount"] / 100,
+                                        total_received: total_received,
                                         code: vnp_Params["vnp_TxnRef"],
                                         message: vnp_Params["vnp_OrderInfo"],
                                         payment_method: "banking",
@@ -125,10 +126,8 @@ class PayMentController {
                                             `/checkout?mode=order&code=${vnp_Params["vnp_TxnRef"]}&payment_id=${newPayment._id}`
                                     );
                                 }
-
-                                // res.status(200).json({ RspCode: "00", Message: "Thanh toán thành công" });
                             } else {
-                                res.status(200).json({ RspCode: "00", Message: "Success" });
+                                res.redirect(process.env.NODE_URL_CLIENT + "/checkout");
                             }
                         } else {
                             res.status(200).json({ RspCode: "02", Message: "This order has been updated to the payment status" });

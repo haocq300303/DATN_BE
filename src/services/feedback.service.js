@@ -10,6 +10,15 @@ export const getAllFeedback = (options) => {
   );
 };
 
+export const getByOptions = (options) => {
+  const query = {
+    [options.field]: options.payload,
+  };
+  return Feedback.findOne(query);
+};
+export const getOneFeedback = (idFeedback) => {
+  return Feedback.findById(idFeedback).populate("id_user");
+};
 export const createFeedback = (feedback) => {
   return Feedback.create(feedback);
 };

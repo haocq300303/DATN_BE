@@ -29,19 +29,23 @@ const PitchSchema = new Schema(
       type: String,
       required: true,
     },
-    shifts: [
+    services: [
       {
         type: mongoose.ObjectId,
-        ref: "Shift",
+        ref: "Service",
       },
     ],
+    districts_id: {
+      type: String,
+      required: true,
+    },
     location_id: {
       type: String,
       required: true,
     },
-    deposit_price: {
+    average_price: {
       type: Number,
-      required: true,
+      default: 0,
     },
     avatar: {
       type: String,

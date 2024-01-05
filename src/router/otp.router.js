@@ -1,21 +1,22 @@
-import express from "express";
-import { otpController } from "../controllers";
+import express from 'express';
+import { otpController } from '../controllers';
+import { authMiddleware } from '../middlewares';
 
 const routerOtp = express.Router();
 
 // GET ALL
-routerOtp.get("/", otpController.getAll);
+routerOtp.get('/', authMiddleware.verifyToken, otpController.getAll);
 
 // GET BY ID
-routerOtp.get("/:id", otpController.getById);
+routerOtp.get('/:id', authMiddleware.verifyToken, otpController.getById);
 
 // CREATE
-routerOtp.post("/", otpController.create);
+routerOtp.post('/', authMiddleware.verifyToken, otpController.create);
 
 // UPDATE
-routerOtp.put("/:id", otpController.update);
+routerOtp.put('/:id', authMiddleware.verifyToken, otpController.update);
 
 // DELETE
-routerOtp.delete("/:id", otpController.remove);
+routerOtp.delete('/:id', authMiddleware.verifyToken, otpController.remove);
 
 export default routerOtp;

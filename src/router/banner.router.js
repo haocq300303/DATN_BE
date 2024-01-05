@@ -1,19 +1,37 @@
-import express from "express";
-import { bannerController } from "../controllers";
-
+import express from 'express';
+import { bannerController } from '../controllers';
+import { authMiddleware } from '../middlewares';
 
 const routerBanner = express.Router();
 
 // GET ALL
-routerBanner.get("/", bannerController.getAll);
+routerBanner.get('/', bannerController.getAll);
+
+// GET ONE
+routerBanner.get('/:id', bannerController.getOne);
 
 // CREATE
-routerBanner.post("/", bannerController.create);
+routerBanner.post(
+  '/',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyAdmin,
+  bannerController.create
+);
 
 // UPDATE
-routerBanner.put("/:id", bannerController.update);
+routerBanner.patch(
+  '/:id',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyAdmin,
+  bannerController.update
+);
 
 // REMOVE
-routerBanner.delete("/:id", bannerController.remove);
+routerBanner.delete(
+  '/:id',
+  authMiddleware.verifyToken,
+  authMiddleware.verifyAdmin,
+  bannerController.remove
+);
 
 export default routerBanner;

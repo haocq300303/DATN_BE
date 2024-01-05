@@ -1,18 +1,16 @@
-import Joi from "joi";
+import Joi from 'joi';
 
-const locationSchema = Joi.object({
+const pitchSchema = Joi.object({
   name: Joi.string().required(),
   address: Joi.string().required(),
-  admin_pitch_id: Joi.string().required(),
+  admin_pitch_id: Joi.string(),
   images: Joi.array().items(Joi.string()).required(),
   numberPitch: Joi.number().required(),
   description: Joi.string().required(),
-  shifts: Joi.array(),
   location_id: Joi.string().required(),
-  deposit_price: Joi.number().required(),
+  districts_id: Joi.string(),
+  average_price: Joi.number(),
   avatar: Joi.string().required(),
-  comment_id: Joi.array(),
-  feedback_id: Joi.array(),
 });
 
-export default locationSchema;
+export default pitchSchema;

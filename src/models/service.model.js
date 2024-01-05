@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-
 const serviceSchema = new Schema(
   {
     name: {
@@ -11,10 +10,15 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
-    id_Pitch: {
-      default: null,
+    admin_pitch_id: {
+      type: mongoose.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    pitch_id: {
       type: mongoose.ObjectId,
       ref: "Pitch",
+      required: true,
     },
     image: {
       type: String,
